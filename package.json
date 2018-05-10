@@ -1,0 +1,32 @@
+{
+  "name": "http-signature-header",
+  "version": "0.0.1-0",
+  "description": "",
+  "main": "lib",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "mocha ./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digitalbazaar/http-signature-header.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/digitalbazaar/http-signature-header/issues"
+  },
+  "homepage": "https://github.com/digitalbazaar/http-signature-header#readme",
+  "dependencies": {
+    "assert-plus": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1",
+    "uuid": "^3.2.1"
+  },
+  "engines": {
+    "node": ">=8.6.0"
+  }
+}
