@@ -13,7 +13,11 @@
     "type": "git",
     "url": "git+https://github.com/digitalbazaar/http-signature-header.git"
   },
-  "author": "",
+  "author": {
+    "name": "Digital Bazaar, Inc.",
+    "email": "support@digitalbazaar.com",
+    "url": "https://digitalbazaar.com/"
+  },
   "bugs": {
     "url": "https://github.com/digitalbazaar/http-signature-header/issues"
   },
