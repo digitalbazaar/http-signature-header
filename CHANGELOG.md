@@ -1,5 +1,7 @@
 # http-signature-header
 
+## 1.1.1 - 2018-07-24
+
 ### Fixed
 - Fix serialization of values for headers that
   appear multiple times (join using `, `
