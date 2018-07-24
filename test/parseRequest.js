@@ -281,6 +281,57 @@ describe('parseRequest API', () => {
       });
     });
   });
+  it('valid custom headers with multiple values', done => {
+    server.tester = (req, res) => {
+      const parsed = httpSignatureHeader.parseRequest(req);
+      res.writeHead(200);
+      res.write(JSON.stringify(parsed, null, 2));
+      res.end();
+    };
+    options.headers.Authorization =
+      'Signature keyId="fo,o",algorithm="RSA-sha256",' +
+      'headers="x-custom dAtE dIgEsT (request-target)",' +
+      'extensions="blah blah",signature="digitalSignature"';
+    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers['digest'] = uuid();
+    options.headers['x-custom'] = ['val1', 'val2'];
+
+    http.get(options, res => {
+      res.statusCode.should.equal(200);
+
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+
+      res.on('end', () => {
+        const parsed = JSON.parse(body);
+        should.exist(parsed);
+        parsed.scheme.should.equal('Signature');
+        should.exist(parsed.params);
+        parsed.params.keyId.should.equal('fo,o');
+        parsed.params.algorithm.should.equal('rsa-sha256');
+        parsed.params.extensions.should.equal('blah blah');
+        should.exist(parsed.params.headers);
+        parsed.params.headers.length.should.equal(4);
+        parsed.params.headers[0].should.equal('x-custom');
+        parsed.params.headers[1].should.equal('date');
+        parsed.params.headers[2].should.equal('digest');
+        parsed.params.headers[3].should.equal('(request-target)');
+        parsed.params.signature.should.equal('digitalSignature');
+        should.exist(parsed.signingString);
+        parsed.signingString.should.equal(
+          'x-custom: ' + options.headers['x-custom'].join(', ') + '\n' +
+          'date: ' + options.headers.Date + '\n' +
+          'digest: ' + options.headers['digest'] + '\n' +
+          '(request-target): get /');
+        parsed.params.keyId.should.equal(parsed.keyId);
+        parsed.params.algorithm.toUpperCase().should.equal(parsed.algorithm);
+        done();
+      });
+    });
+  });
   it('expired', done => {
     server.tester = (req, res) => {
       const options = {

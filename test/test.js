@@ -88,6 +88,21 @@ describe('http-signature', () => {
         `host: example.com:18443\ndate: ${date}\n(request-target): get /1/2/3`);
       done();
     });
+    it('properly encodes a header with multiple values', done => {
+      const date = jsprim.rfc1123(new Date());
+      const requestOptions = {
+        headers: {date, 'x-custom': ['val1', 'val2']},
+        method: 'GET',
+        url: 'https://example.com/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['x-custom', 'host', 'date', '(request-target)'],
+          requestOptions});
+      stringToSign.should.equal(
+        `x-custom: val1, val2\nhost: example.com\ndate: ` +
+        `${date}\n(request-target): get /1/2/3`);
+      done();
+    });
     it('throws when an unknown header is specified', done => {
       const date = jsprim.rfc1123(new Date());
       const requestOptions = {

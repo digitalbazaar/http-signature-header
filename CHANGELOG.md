@@ -1,5 +1,10 @@
 # http-signature-header
 
+### Fixed
+- Fix serialization of values for headers that
+  appear multiple times (join using `, `
+  rather than just `,`) per Section 2.3.2 of RFC.
+
 ## 1.1.0 - 2018-05-18
 
 ### Added
