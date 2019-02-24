@@ -3,14 +3,13 @@
  * https://github.com/joyent/node-http-signature
  * Copyright 2012 Joyent, Inc.  All rights reserved.
  *
- * Copyright (c) 2018 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2018-2019 Digital Bazaar, Inc. All rights reserved.
  */
 'use strict';
 
 const chai = require('chai');
 const http = require('http');
 const httpSignatureHeader = require('..');
-const jsprim = require('jsprim');
 const should = chai.should();
 const uuid = require('uuid/v4');
 
@@ -206,7 +205,7 @@ describe('parseRequest API', () => {
     };
     options.headers.Authorization =
       'Signature keyId="foo",algorithm="rsa-sha256",signature="aaabbbbcccc"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -227,7 +226,7 @@ describe('parseRequest API', () => {
     options.headers.Authorization =
       'Signature keyId="foo",algorithm="rsa-sha256",' +
       'headers="date digest",signature="aaabbbbcccc"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -244,7 +243,7 @@ describe('parseRequest API', () => {
       'Signature keyId="fo,o",algorithm="RSA-sha256",' +
       'headers="dAtE dIgEsT (request-target)",' +
       'extensions="blah blah",signature="digitalSignature"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     options.headers['digest'] = uuid();
 
     http.get(options, res => {
@@ -292,7 +291,7 @@ describe('parseRequest API', () => {
       'Signature keyId="fo,o",algorithm="RSA-sha256",' +
       'headers="x-custom dAtE dIgEsT (request-target)",' +
       'extensions="blah blah",signature="digitalSignature"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     options.headers['digest'] = uuid();
     options.headers['x-custom'] = ['val1', 'val2'];
 
@@ -355,7 +354,7 @@ describe('parseRequest API', () => {
     options.headers.Authorization =
       'Signature keyId="f,oo",algorithm="RSA-sha256",' +
       'headers="dAtE dIgEsT",signature="digitalSignature"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     options.headers['digest'] = uuid();
     http.get(options, res => {
       res.statusCode.should.equal(200);
@@ -381,7 +380,7 @@ describe('parseRequest API', () => {
     options.headers.Authorization =
       'Signature keyId="f,oo",algorithm="RSA-sha256",' +
       'headers="dAtE cOntEnt-MD5",signature="digitalSignature"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     options.headers['content-md5'] = uuid();
     http.get(options, res => {
       res.statusCode.should.equal(200);
@@ -406,7 +405,7 @@ describe('parseRequest API', () => {
     options.headers.Authorization =
       'Signature keyId="f,oo",algorithm="RSA-sha256",' +
       'headers="dAtE cOntEnt-MD5",signature="digitalSignature"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     options.headers['content-md5'] = uuid();
     http.get(options, res => {
       res.statusCode.should.equal(200);
@@ -426,7 +425,7 @@ describe('parseRequest API', () => {
     };
     options.headers['x-auth'] =
       'Signature keyId="foo",algorithm="rsa-sha256",signature="aaabbbbcccc"';
-    options.headers.Date = jsprim.rfc1123(new Date());
+    options.headers.Date = new Date().toUTCString();
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
