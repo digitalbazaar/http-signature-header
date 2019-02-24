@@ -5,6 +5,9 @@
 ### Added
 - Enable use of this library in the browser.
 
+### Removed
+- Remove unnecessary `jsprim` dependency.
+
 ## 1.1.1 - 2018-07-24
 
 ### Fixed

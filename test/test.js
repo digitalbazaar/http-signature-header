@@ -8,14 +8,13 @@ chai.should();
 
 const {expect} = chai;
 const httpSignatureHeader = require('..');
-const jsprim = require('jsprim');
 const HttpSignatureError = require('../lib/HttpSignatureError');
 
 describe('http-signature', () => {
 
   describe('createSignatureString API', () => {
     it('uses `date` header if specified', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
         method: 'GET',
@@ -27,7 +26,7 @@ describe('http-signature', () => {
       done();
     });
     it('properly encodes `(request-target)` with root path', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
         method: 'GET',
@@ -39,7 +38,7 @@ describe('http-signature', () => {
       done();
     });
     it('properly encodes `(request-target)` with a path', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
         method: 'GET',
@@ -51,7 +50,7 @@ describe('http-signature', () => {
       done();
     });
     it('properly encodes `(request-target)` with post method', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
         method: 'POST',
@@ -63,7 +62,7 @@ describe('http-signature', () => {
       done();
     });
     it('properly encodes `host`', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
         method: 'GET',
@@ -76,7 +75,7 @@ describe('http-signature', () => {
       done();
     });
     it('properly encodes `host` with a port', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
         method: 'GET',
@@ -89,7 +88,7 @@ describe('http-signature', () => {
       done();
     });
     it('properly encodes a header with multiple values', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date, 'x-custom': ['val1', 'val2']},
         method: 'GET',
@@ -104,7 +103,7 @@ describe('http-signature', () => {
       done();
     });
     it('throws when an unknown header is specified', done => {
-      const date = jsprim.rfc1123(new Date());
+      const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
         method: 'GET',
