@@ -13,14 +13,14 @@ const httpSignatureHeader = require('..');
 const should = chai.should();
 const uuid = require('uuid/v4');
 
-let options = null;
+let commonOptions = null;
 let server = null;
 let socket = null;
 
 describe('parseRequest API', () => {
   before(() => {
     socket = '/tmp/.' + uuid();
-    options = {
+    commonOptions = {
       socketPath: socket,
       path: '/',
       headers: {}
@@ -47,6 +47,9 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -63,7 +66,11 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization = 'Basic blahBlahBlah';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -81,7 +88,10 @@ describe('parseRequest API', () => {
       res.end();
     };
 
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization = 'Signature foo';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -98,7 +108,11 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization = 'Signature keyId=';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -115,8 +129,12 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId=foo,algorithm=hmac-sha1,signature=aabbcc';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -134,7 +152,10 @@ describe('parseRequest API', () => {
       res.end();
     };
 
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization = 'Signature "keyId"="key"';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -152,7 +173,11 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization = 'Signature key Id="key"';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -169,7 +194,11 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization = 'Signature keyId="foo",algorithm="foo"';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -186,8 +215,12 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="foo",algorithm="rsa-sha256",signature="aaabbbbcccc"';
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -203,9 +236,40 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="foo",algorithm="rsa-sha256",signature="aaabbbbcccc"';
     options.headers.Date = new Date().toUTCString();
+
+    http.get(options, res => {
+      res.statusCode.should.equal(200);
+      done();
+    });
+  });
+  it('valid expires header', done => {
+    server.tester = (req, res) => {
+      const options = {
+        headers: ['expires']
+      };
+
+      try {
+        httpSignatureHeader.parseRequest(req, options);
+      } catch(err) {
+        should.not.exist(err);
+      }
+      res.writeHead(200);
+      res.end();
+    };
+
+    const options = {...commonOptions};
+    options.headers = {};
+    options.headers.Authorization =
+      'Signature keyId="foo",algorithm="rsa-sha256",' +
+      'headers="expires",signature="aaabbbbcccc"';
+    options.headers.Expires = new Date(Date.now() + 600000).toUTCString();
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -223,10 +287,14 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="foo",algorithm="rsa-sha256",' +
       'headers="date digest",signature="aaabbbbcccc"';
     options.headers.Date = new Date().toUTCString();
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -239,12 +307,15 @@ describe('parseRequest API', () => {
       res.write(JSON.stringify(parsed, null, 2));
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="fo,o",algorithm="RSA-sha256",' +
       'headers="dAtE dIgEsT (request-target)",' +
       'extensions="blah blah",signature="digitalSignature"';
     options.headers.Date = new Date().toUTCString();
-    options.headers['digest'] = uuid();
+    options.headers.digest = uuid();
 
     http.get(options, res => {
       res.statusCode.should.equal(200);
@@ -287,12 +358,15 @@ describe('parseRequest API', () => {
       res.write(JSON.stringify(parsed, null, 2));
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="fo,o",algorithm="RSA-sha256",' +
       'headers="x-custom dAtE dIgEsT (request-target)",' +
       'extensions="blah blah",signature="digitalSignature"';
     options.headers.Date = new Date().toUTCString();
-    options.headers['digest'] = uuid();
+    options.headers.digest = uuid();
     options.headers['x-custom'] = ['val1', 'val2'];
 
     http.get(options, res => {
@@ -331,7 +405,7 @@ describe('parseRequest API', () => {
       });
     });
   });
-  it('expired', done => {
+  it('expired via clock skew', done => {
     server.tester = (req, res) => {
       const options = {
         clockSkew: 1,
@@ -342,20 +416,54 @@ describe('parseRequest API', () => {
         try {
           httpSignatureHeader.parseRequest(req, options);
         } catch(err) {
-          err.name.should.equal('SyntaxError');
+          err.name.should.equal('ConstraintError');
           err.message.should.match(
-            /clock skew of \d\.\d+s was greater than 1s/);
+            /Clock skew of \d\.\d+s was greater than 1s/);
         }
         res.writeHead(200);
         res.end();
       }, 1200);
     };
 
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="f,oo",algorithm="RSA-sha256",' +
       'headers="dAtE dIgEsT",signature="digitalSignature"';
     options.headers.Date = new Date().toUTCString();
-    options.headers['digest'] = uuid();
+    options.headers.digest = uuid();
+
+    http.get(options, res => {
+      res.statusCode.should.equal(200);
+      done();
+    });
+  });
+  it('expired via "Expires" header', done => {
+    server.tester = (req, res) => {
+      const options = {
+        headers: ['expires']
+      };
+
+      setTimeout(() => {
+        try {
+          httpSignatureHeader.parseRequest(req, options);
+        } catch(err) {
+          err.name.should.equal('ConstraintError');
+          err.message.should.equal('The request has expired.');
+        }
+        res.writeHead(200);
+        res.end();
+      }, 1200);
+    };
+
+    const options = {...commonOptions};
+    options.headers = {};
+    options.headers.Authorization =
+      'Signature keyId="f,oo",algorithm="RSA-sha256",' +
+      'headers="exPiRes dIgEsT",signature="digitalSignature"';
+    options.headers.Expires = new Date().toUTCString();
+    options.headers.digest = uuid();
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -377,11 +485,14 @@ describe('parseRequest API', () => {
       res.end();
     };
 
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="f,oo",algorithm="RSA-sha256",' +
       'headers="dAtE cOntEnt-MD5",signature="digitalSignature"';
     options.headers.Date = new Date().toUTCString();
     options.headers['content-md5'] = uuid();
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -402,11 +513,14 @@ describe('parseRequest API', () => {
       res.end();
     };
 
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers.Authorization =
       'Signature keyId="f,oo",algorithm="RSA-sha256",' +
       'headers="dAtE cOntEnt-MD5",signature="digitalSignature"';
     options.headers.Date = new Date().toUTCString();
     options.headers['content-md5'] = uuid();
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
@@ -423,9 +537,13 @@ describe('parseRequest API', () => {
       res.writeHead(200);
       res.end();
     };
+
+    const options = {...commonOptions};
+    options.headers = {};
     options.headers['x-auth'] =
       'Signature keyId="foo",algorithm="rsa-sha256",signature="aaabbbbcccc"';
     options.headers.Date = new Date().toUTCString();
+
     http.get(options, res => {
       res.statusCode.should.equal(200);
       done();
