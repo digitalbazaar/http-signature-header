@@ -1,6 +1,6 @@
 # http-signature-header
 
-## 1.2.0 - 2019-xx-xx
+## 1.2.0 - 2019-03-02
 
 ### Added
 - Enable use of this library in the browser.
