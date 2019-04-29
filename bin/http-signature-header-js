@@ -1,9 +1,11 @@
+#!/usr/bin/env node
+
 const program = require('commander');
-const httpSigs = require('../lib/);
+const httpSigs = require('../lib/');
 
 program
   .command('sign')
-  .alias('i)
+  .alias('i')
   .option('-h, --headers <headers>', 'Headers for the signature.')
   .action(async cmd => {
     try {
@@ -11,11 +13,12 @@ program
         throw new Error('Too many arguments.');
       }
       if(!cmd.headers) { throw new Error('headers required') }
-      const result = httpSigs.createSignatureString({includeHeaders, requestOptions});
+      const result = httpSigs.
+        createSignatureString({includeHeaders, requestOptions});
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
-      process.exit(1)
+      process.exit(1);
     }
-  })
+  });
 
 program.parse(process.argv);
