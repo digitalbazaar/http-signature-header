@@ -3,16 +3,26 @@
 const program = require('commander');
 const httpSigs = require('../lib/');
 
+console.log('http-signature-header');
+
 program
   .command('sign')
-  .alias('i')
+  .alias('S')
   .option('-h, --headers <headers>', 'Headers for the signature.')
+  .option('-o, --requestOptions <requestOptions>', 'Options for the request.')
   .action(async cmd => {
     try {
-      if(arguments.length > 1) {
-        throw new Error('Too many arguments.');
-      }
-      if(!cmd.headers) { throw new Error('headers required') }
+      const date = new Date().toUTCString();
+      const defaultOptions = {
+        headers: {date},
+        method: 'GET',
+        url: 'https://example.com',
+      };
+      console.log(cmd.requestOptions);
+      const requestOptions = cmd.requestOptions ?
+        JSON.parse(cmd.requestOptions) : defaultOptions;
+      if(!cmd.headers) {throw new Error('headers required');}
+      const includeHeaders = JSON.parse(cmd.headers);
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
     } catch(e) {
