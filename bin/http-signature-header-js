@@ -1,0 +1,21 @@
+const program = require('commander');
+const httpSigs = require('../lib/);
+
+program
+  .command('sign')
+  .alias('i)
+  .option('-h, --headers <headers>', 'Headers for the signature.')
+  .action(async cmd => {
+    try {
+      if(arguments.length > 1) {
+        throw new Error('Too many arguments.');
+      }
+      if(!cmd.headers) { throw new Error('headers required') }
+      const result = httpSigs.createSignatureString({includeHeaders, requestOptions});
+    } catch(e) {
+      console.error('Error:', JSON.stringify(e, null, e), e);
+      process.exit(1)
+    }
+  })
+
+program.parse(process.argv);
