@@ -2,6 +2,7 @@
 
 const program = require('commander');
 const httpSigs = require('../lib/');
+const fs = require('fs');
 
 program
   .command('sign')
@@ -23,7 +24,7 @@ program
       const includeHeaders = JSON.parse(cmd.headers);
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
-      console.log(result);
+      console.log(JSON.stringify(result));
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
       process.exit(1);
@@ -48,7 +49,7 @@ program
         signature
       };
       const result = httpSigs.createAuthzHeader(options);
-      console.log(result);
+      console.log(JSON.stringify(result));
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
       process.exit(1);
@@ -66,14 +67,29 @@ program
       if(!request) {
         throw new Error('--request must be a json object.');
       }
-      const reqJson = JSON.parse(request);
+      const json = isJson(request);
+      const _request = json ? request : getFile(request);
+      const reqJson = JSON.parse(_request);
       const options = ops ? JSON.parse(ops) : undefined;
       const result = httpSigs.parseRequest(reqJson, options);
-      console.log(result);
+      console.log(JSON.stringify(result));
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
       process.exit(1);
     }
   });
 
+function isJson(str) {
+  try {
+    JSON.parse(str);
+  } catch(e) {
+    return false;
+  }
+  return true;
+}
+
+function getFile(path) {
+  const file = fs.readFileSync(path);
+  return file;
+}
 program.parse(process.argv);
