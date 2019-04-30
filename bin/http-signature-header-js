@@ -19,7 +19,7 @@ program
       };
       const requestOptions = cmd.requestOptions ?
         JSON.parse(cmd.requestOptions) : defaultOptions;
-      if(!cmd.headers) {throw new Error('headers required');}
+      if(!cmd.headers) {throw new Error('--headers required');}
       const includeHeaders = JSON.parse(cmd.headers);
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
@@ -39,7 +39,15 @@ program
   .option('-s, --signature <signature>', 'Signature.')
   .action(async cmd => {
     try {
-      const result = httpSigs.createAuthzHeader(cmd);
+      const {algorithm, headers, keyId, signature} = cmd;
+      const jsonHeaders = JSON.parse(headers);
+      const options = {
+        algorithm,
+        headers: jsonHeaders,
+        keyId,
+        signature
+      };
+      const result = httpSigs.createAuthzHeader(options);
       console.log(result);
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
@@ -55,8 +63,10 @@ program
   .action(async cmd => {
     try {
       const {request, ops} = cmd;
+      if(!request) {
+        throw new Error('--request must be a json object.');
+      }
       const reqJson = JSON.parse(request);
-      console.log('request', reqJson);
       const options = ops ? JSON.parse(ops) : undefined;
       const result = httpSigs.parseRequest(reqJson, options);
       console.log(result);
