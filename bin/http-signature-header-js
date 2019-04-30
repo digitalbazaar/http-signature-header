@@ -3,13 +3,12 @@
 const program = require('commander');
 const httpSigs = require('../lib/');
 
-console.log('http-signature-header');
-
 program
   .command('sign')
   .alias('S')
   .option('-h, --headers <headers>', 'Headers for the signature.')
-  .option('-o, --requestOptions <requestOptions>', 'Options for the request.')
+  .option('-o, --requestOptions <requestOptions>',
+    'Optional Options for the request.')
   .action(async cmd => {
     try {
       const date = new Date().toUTCString();
@@ -51,12 +50,15 @@ program
 program
   .command('request')
   .alias('R')
-  .option('-r, --request <request>', 'algorithm for verification.')
-  .option('-o, --ops <ops>', 'Headers for the signature.')
+  .option('-r, --request <request>', 'Stringified json request object.')
+  .option('-o, --ops <ops>', 'Options for the request.')
   .action(async cmd => {
     try {
-      const {request, ops: options} = cmd;
-      const result = httpSigs.parseRequest(request, options);
+      const {request, ops} = cmd;
+      const reqJson = JSON.parse(request);
+      console.log('request', reqJson);
+      const options = ops ? JSON.parse(ops) : undefined;
+      const result = httpSigs.parseRequest(reqJson, options);
       console.log(result);
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
