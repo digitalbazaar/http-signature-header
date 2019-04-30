@@ -18,13 +18,46 @@ program
         method: 'GET',
         url: 'https://example.com',
       };
-      console.log(cmd.requestOptions);
       const requestOptions = cmd.requestOptions ?
         JSON.parse(cmd.requestOptions) : defaultOptions;
       if(!cmd.headers) {throw new Error('headers required');}
       const includeHeaders = JSON.parse(cmd.headers);
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
+      console.log(result);
+    } catch(e) {
+      console.error('Error:', JSON.stringify(e, null, e), e);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('authz')
+  .alias('A')
+  .option('-a, --algorithm <algorithm>', 'algorithm for verification.')
+  .option('-h, --headers <headers>', 'Headers for the signature.')
+  .option('-k, --keyId <keyId>', 'keyId.')
+  .option('-s, --signature <signature>', 'Signature.')
+  .action(async cmd => {
+    try {
+      const result = httpSigs.createAuthzHeader(cmd);
+      console.log(result);
+    } catch(e) {
+      console.error('Error:', JSON.stringify(e, null, e), e);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('request')
+  .alias('R')
+  .option('-r, --request <request>', 'algorithm for verification.')
+  .option('-o, --ops <ops>', 'Headers for the signature.')
+  .action(async cmd => {
+    try {
+      const {request, ops: options} = cmd;
+      const result = httpSigs.parseRequest(request, options);
+      console.log(result);
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
       process.exit(1);
