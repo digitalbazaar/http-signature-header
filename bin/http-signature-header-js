@@ -19,9 +19,9 @@ program
         url: 'https://example.com',
       };
       const requestOptions = cmd.requestOptions ?
-        JSON.parse(cmd.requestOptions) : defaultOptions;
+        getJsonFile(cmd.requestOptions) : defaultOptions;
       if(!cmd.headers) {throw new Error('--headers required');}
-      const includeHeaders = JSON.parse(cmd.headers);
+      const includeHeaders = getJsonFile(cmd.headers);
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
       console.log(JSON.stringify(result));
@@ -41,7 +41,7 @@ program
   .action(async cmd => {
     try {
       const {algorithm, headers, keyId, signature} = cmd;
-      const jsonHeaders = JSON.parse(headers);
+      const jsonHeaders = getJsonFile(headers);
       const options = {
         algorithm,
         headers: jsonHeaders,
@@ -67,9 +67,7 @@ program
       if(!request) {
         throw new Error('--request must be a json object.');
       }
-      const json = isJson(request);
-      const _request = json ? request : getFile(request);
-      const reqJson = JSON.parse(_request);
+      const reqJson = getJsonFile(request);
       const options = ops ? JSON.parse(ops) : undefined;
       const result = httpSigs.parseRequest(reqJson, options);
       console.log(JSON.stringify(result));
@@ -79,17 +77,8 @@ program
     }
   });
 
-function isJson(str) {
-  try {
-    JSON.parse(str);
-  } catch(e) {
-    return false;
-  }
-  return true;
-}
-
-function getFile(path) {
+function getJsonFile(path) {
   const file = fs.readFileSync(path);
-  return file;
+  return JSON.parse(file);
 }
 program.parse(process.argv);
