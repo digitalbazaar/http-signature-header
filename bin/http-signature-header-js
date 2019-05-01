@@ -44,7 +44,7 @@ program
       const jsonHeaders = getJsonFile(headers);
       const options = {
         algorithm,
-        headers: jsonHeaders,
+        includeHeaders: jsonHeaders,
         keyId,
         signature
       };
