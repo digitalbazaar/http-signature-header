@@ -3,6 +3,7 @@
 const program = require('commander');
 const httpSigs = require('../lib/');
 const fs = require('fs');
+const httpMessageParser = require('http-message-parser');
 
 program
   .command('sign')
@@ -67,7 +68,7 @@ program
       if(!request) {
         throw new Error('--request must be a json object.');
       }
-      const reqJson = getJsonFile(request);
+      const reqJson = getHttpMessage(request);
       const options = ops ? JSON.parse(ops) : undefined;
       const result = httpSigs.parseRequest(reqJson, options);
       console.log(JSON.stringify(result));
@@ -76,6 +77,12 @@ program
       process.exit(1);
     }
   });
+
+function getHttpMessage(path) {
+  const messageBuffer = fs.readFileSync(path);
+  const parsedMessage = httpMessageParser(messageBuffer);
+  return parsedMessage;
+}
 
 function getJsonFile(path) {
   const file = fs.readFileSync(path);
