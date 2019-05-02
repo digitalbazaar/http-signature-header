@@ -6,9 +6,8 @@ const fs = require('fs');
 const httpMessageParser = require('http-message-parser');
 
 program
-  .command('sign')
-  .alias('S')
-  .option('-h, --headers <headers>', 'Headers for the signature.')
+  .command('c14n')
+  .alias('C')
   .option('-o, --requestOptions <requestOptions>',
     'Optional Options for the request.')
   .action(async cmd => {
@@ -33,8 +32,8 @@ program
   });
 
 program
-  .command('authz')
-  .alias('A')
+  .command('sign')
+  .alias('S')
   .option('-a, --algorithm <algorithm>', 'algorithm for verification.')
   .option('-h, --headers <headers>', 'Headers for the signature.')
   .option('-k, --keyId <keyId>', 'keyId.')
@@ -58,8 +57,8 @@ program
   });
 
 program
-  .command('request')
-  .alias('R')
+  .command('verify')
+  .alias('V')
   .option('-r, --request <request>', 'Stringified json request object.')
   .option('-o, --ops <ops>', 'Options for the request.')
   .action(async cmd => {
@@ -88,4 +87,18 @@ function getJsonFile(path) {
   const file = fs.readFileSync(path);
   return JSON.parse(file);
 }
-program.parse(process.argv);
+
+program
+  .version('0.0.1')
+  .option('-head, --headers <headers>', 'A list of header names.')
+  .option('-k, --keyId <keyId>', 'A Key Id <string>.')
+  .option('-pk, --private-key <privateKey>.',
+    'A private key file name <filename>.')
+  .option('-pkt, --private-key-type <privateKeyType',
+    'The type of the private key.')
+  .option('-a, --algorithm <algorithm>',
+    'One of: rsa-sha1, hmac-sha1, rsa-sha256, hmac-sha256, hs2019.',
+    /^(rsa-sha1|hmac-sha1|rsa-sha256|hmac-sha256|hs2019)$/i)
+  .option('-c, --created <created>', 'The created param for the signature.')
+  .option('-e, --expires <expires>', 'The expires param for the signature.')
+  .parse(process.argv);
