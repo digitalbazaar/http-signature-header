@@ -8,25 +8,20 @@ const httpMessageParser = require('http-message-parser');
 program
   .command('c14n')
   .alias('C')
-  .option('-o, --requestOptions <requestOptions>',
-    'Optional Options for the request.')
-  .action(async cmd => {
+  .action(async httpMessage => {
+    // the last string passed to the command is the first arg
+    // the second arg will be the cmd
     try {
-      const date = new Date().toUTCString();
-      const defaultOptions = {
-        headers: {date},
-        method: 'GET',
-        url: 'https://example.com',
-      };
-      const requestOptions = cmd.requestOptions ?
-        getJsonFile(cmd.requestOptions) : defaultOptions;
-      if(!cmd.headers) {throw new Error('--headers required');}
-      const includeHeaders = getJsonFile(cmd.headers);
+      const requestOptions = httpMessageParser(httpMessage);
+      if(!program.headers) {throw new Error('--headers required');}
+      const includeHeaders = program.headers ? program.headers.split(',') : [];
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
-      console.log(JSON.stringify(result));
+      console.log(result);
+      console.log(0);
+      process.exit(0);
     } catch(e) {
-      console.error('Error:', JSON.stringify(e, null, e), e);
+      console.error(e);
       process.exit(1);
     }
   });
@@ -88,17 +83,19 @@ function getJsonFile(path) {
   return JSON.parse(file);
 }
 
+// all of the common options are accessed
+// from program.name i.e. program.headers etc
 program
   .version('0.0.1')
-  .option('-head, --headers <headers>', 'A list of header names.')
+  .option('-H, --headers <headers>', 'A list of header names.')
   .option('-k, --keyId <keyId>', 'A Key Id <string>.')
   .option('-pk, --private-key <privateKey>.',
     'A private key file name <filename>.')
   .option('-pkt, --private-key-type <privateKeyType',
     'The type of the private key.')
-  .option('-a, --algorithm <algorithm>',
+  .option('-a, --algorithm [algorithm]',
     'One of: rsa-sha1, hmac-sha1, rsa-sha256, hmac-sha256, hs2019.',
     /^(rsa-sha1|hmac-sha1|rsa-sha256|hmac-sha256|hs2019)$/i)
-  .option('-c, --created <created>', 'The created param for the signature.')
-  .option('-e, --expires <expires>', 'The expires param for the signature.')
+  .option('-c, --created [created]', 'The created param for the signature.')
+  .option('-e, --expires [expires]', 'The expires param for the signature.')
   .parse(process.argv);
