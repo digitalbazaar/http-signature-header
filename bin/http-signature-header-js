@@ -3,18 +3,59 @@
 const program = require('commander');
 const httpSigs = require('../lib/');
 const fs = require('fs');
+const util = require('util');
 const httpMessageParser = require('http-message-parser');
+
+// this can be use to await paths to private keys and other files.
+const readFile = util.promisify(fs.readFile);
+
+/**
+ * Simple wrapper around node's process.stdin.
+ * This allows us to get the result of cat and other commands.
+ *
+ * @param {string} [encoding='utf8'] - The http message's encoding.
+ *
+ * @returns {Promise<string>} Should return the http message.
+ */
+async function getStdIn(encoding = 'utf8') {
+  const {stdin} = process;
+  let message = '';
+  return new Promise((resolve, reject) => {
+    try {
+      // if stdin hangs then we need to error.
+      if(stdin.isTTY) {
+        return resolve(message);
+      }
+      stdin.setEncoding(encoding);
+      stdin.on('readable', () => {
+        let chunk;
+
+        while((chunk = stdin.read())) {
+          message += chunk;
+        }
+      });
+      stdin.on('end', () => resolve(message));
+    }
+    catch(e) {
+      reject(e);
+    }
+  });
+}
 
 program
   .command('c14n')
   .alias('C')
-  .action(async httpMessage => {
+  .action(async () => {
     // the last string passed to the command is the first arg
     // the second arg will be the cmd
     try {
+      const httpMessage = await getStdIn();
+      if(!httpMessage) {
+        throw new Error('An Http Message must be passed to stdin.');
+      }
       const requestOptions = httpMessageParser(httpMessage);
       if(!program.headers) {throw new Error('--headers required');}
-      const includeHeaders = program.headers ? program.headers.split(',') : [];
+      const includeHeaders = program.headers ? program.headers.split(',') : '';
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
       console.log(result);
@@ -29,17 +70,15 @@ program
 program
   .command('sign')
   .alias('S')
-  .option('-a, --algorithm <algorithm>', 'algorithm for verification.')
-  .option('-h, --headers <headers>', 'Headers for the signature.')
-  .option('-k, --keyId <keyId>', 'keyId.')
   .option('-s, --signature <signature>', 'Signature.')
   .action(async cmd => {
     try {
-      const {algorithm, headers, keyId, signature} = cmd;
-      const jsonHeaders = getJsonFile(headers);
+      const {signature} = cmd;
+      const {headers, algorithm, keyId} = program;
+      const includeHeaders = headers ? program.headers.split(',') : '';
       const options = {
         algorithm,
-        includeHeaders: jsonHeaders,
+        includeHeaders,
         keyId,
         signature
       };
@@ -54,16 +93,15 @@ program
 program
   .command('verify')
   .alias('V')
-  .option('-r, --request <request>', 'Stringified json request object.')
-  .option('-o, --ops <ops>', 'Options for the request.')
-  .action(async cmd => {
+  .action(async () => {
     try {
-      const {request, ops} = cmd;
-      if(!request) {
-        throw new Error('--request must be a json object.');
+      const httpMessage = await getStdIn();
+      if(!httpMessage) {
+        throw new Error('An http message must be passed to stdin.');
       }
-      const reqJson = getHttpMessage(request);
-      const options = ops ? JSON.parse(ops) : undefined;
+      const reqJson = httpMessageParser(httpMessage);
+      // TODO: get options from program env variables.
+      const options = undefined;
       const result = httpSigs.parseRequest(reqJson, options);
       console.log(JSON.stringify(result));
     } catch(e) {
@@ -71,17 +109,6 @@ program
       process.exit(1);
     }
   });
-
-function getHttpMessage(path) {
-  const messageBuffer = fs.readFileSync(path);
-  const parsedMessage = httpMessageParser(messageBuffer);
-  return parsedMessage;
-}
-
-function getJsonFile(path) {
-  const file = fs.readFileSync(path);
-  return JSON.parse(file);
-}
 
 // all of the common options are accessed
 // from program.name i.e. program.headers etc
