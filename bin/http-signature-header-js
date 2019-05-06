@@ -7,6 +7,7 @@ const util = require('util');
 const httpMessageParser = require('http-message-parser');
 
 // this can be use to await paths to private keys and other files.
+// also can get be used to dereference keyId in middleware
 const readFile = util.promisify(fs.readFile);
 
 /**
@@ -88,6 +89,7 @@ program
         created,
         expires
       } = program;
+      const privateKeyFile = await readFile(privateKey);
       const includeHeaders = headers ? program.headers.split(',') : '';
       const options = {
         algorithm,
@@ -95,7 +97,11 @@ program
         keyId,
         signature
       };
+      // TODO: implement a sign function
+      // like this:
+      // https://github.com/digitalbazaar/bedrock-test/blob/master/lib/helpers.js#L22
       const result = httpSigs.createAuthzHeader(options);
+      throw new Error('Not implemented yet');
       console.log(JSON.stringify(result));
     } catch(e) {
       console.error(JSON.stringify(e));
@@ -118,10 +124,10 @@ program
         created,
         expires
       } = program;
+      const privateKeyFile = await readFile(privateKey);
+      // TODO: abstract middleware verify in this.
       // TODO: get options from program env variables.
-      const options = undefined;
-      const result = httpSigs.parseRequest(reqJson, options);
-      console.log(JSON.stringify(result));
+      throw new Error('Not implemented yet.')
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
       process.exit(1);
