@@ -50,7 +50,7 @@ async function getHttpMessage() {
 }
 
 function makeHttpMessageOutgoing({status = '200 OK', version = '1.1', headers = {}}) {
-  let message = `HTTP/${version} ${status}}`;
+  let message = `HTTP/${version} ${status}`;
   for(const key in headers) {
     let value = headers[key];
     if(Array.isArray(value)) {
