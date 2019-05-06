@@ -42,27 +42,32 @@ async function getStdIn(encoding = 'utf8') {
   });
 }
 
+async function getHttpMessage() {
+  const httpMessage = await getStdIn();
+  if(!httpMessage) {
+    throw new Error('An Http Message must be passed to stdin.');
+  }
+  // this will create a request or response object
+  // similar to node's default request object.
+  const request = httpMessageParser(httpMessage);
+  return request;
+}
+
 program
   .command('c14n')
   .alias('C')
   .action(async () => {
-    // the last string passed to the command is the first arg
-    // the second arg will be the cmd
     try {
-      const httpMessage = await getStdIn();
-      if(!httpMessage) {
-        throw new Error('An Http Message must be passed to stdin.');
-      }
-      const requestOptions = httpMessageParser(httpMessage);
-      if(!program.headers) {throw new Error('--headers required');}
+      const {headers} = program;
+      const requestOptions = await getHttpMessage();
+      if(!headers) {throw new Error('--headers required');}
       const includeHeaders = program.headers ? program.headers.split(',') : '';
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
-      console.log(result);
-      console.log(0);
+      console.log(JSON.stringify(result));
       process.exit(0);
     } catch(e) {
-      console.error(e);
+      throw e;
       process.exit(1);
     }
   });
@@ -74,7 +79,15 @@ program
   .action(async cmd => {
     try {
       const {signature} = cmd;
-      const {headers, algorithm, keyId} = program;
+      const {
+        headers,
+        keyId,
+        privateKey,
+        privateKeyType,
+        algorithm,
+        created,
+        expires
+      } = program;
       const includeHeaders = headers ? program.headers.split(',') : '';
       const options = {
         algorithm,
@@ -85,7 +98,7 @@ program
       const result = httpSigs.createAuthzHeader(options);
       console.log(JSON.stringify(result));
     } catch(e) {
-      console.error('Error:', JSON.stringify(e, null, e), e);
+      console.error(JSON.stringify(e));
       process.exit(1);
     }
   });
@@ -95,11 +108,16 @@ program
   .alias('V')
   .action(async () => {
     try {
-      const httpMessage = await getStdIn();
-      if(!httpMessage) {
-        throw new Error('An http message must be passed to stdin.');
-      }
-      const reqJson = httpMessageParser(httpMessage);
+      const reqJson = await getHttpMessage();
+      const {
+        headers,
+        keyId,
+        privateKey,
+        privateKeyType,
+        algorithm,
+        created,
+        expires
+      } = program;
       // TODO: get options from program env variables.
       const options = undefined;
       const result = httpSigs.parseRequest(reqJson, options);
