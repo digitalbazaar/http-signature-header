@@ -26,7 +26,6 @@ async function getStdIn(encoding = 'utf8') {
       stdin.setEncoding(encoding);
       stdin.on('readable', () => {
         let chunk;
-
         while((chunk = stdin.read())) {
           message += chunk;
         }
@@ -48,6 +47,18 @@ async function getHttpMessage() {
   // similar to node's default request object.
   const request = httpMessageParser(httpMessage);
   return request;
+}
+
+function makeHttpMessageOutgoing({status = '200 OK', version = '1.1', headers = {}}) {
+  let message = `HTTP/${version} ${status}}`;
+  for(const key in headers) {
+    let value = headers[key];
+    if(Array.isArray(value)) {
+      value = value.join(',');
+    }
+    message += `${key}: ${value}`;
+  }
+  return message;
 }
 
 program
