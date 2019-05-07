@@ -41,7 +41,8 @@ async function getStdin(encoding = 'utf8') {
 async function getHTTPMessage() {
   const HTTPMessage = await getStdin();
   if(!HTTPMessage) {
-    throw new Error('An HTTP Message must be passed to stdin.');
+    throw new Error(
+      'An HTTP Message must be passed to stdin for this command.');
   }
   // this will create a request or response object
   // similar to node's default request object.
@@ -84,10 +85,8 @@ program
 
 program
   .command('sign')
-  .option('-s, --signature <signature>', 'Signature.')
   .action(async cmd => {
     try {
-      const {signature} = cmd;
       const {
         headers,
         keyId,
@@ -109,8 +108,8 @@ program
       // like this:
       // https://github.com/digitalbazaar/bedrock-test/blob/master/lib/helpers.js#L22
       const result = httpSigs.createAuthzHeader(options);
-      throw new Error('Not implemented yet');
-      console.log(JSON.stringify(result));
+      throw new Error('command sign has not been implemented yet');
+      console.log(result);
     } catch(e) {
       console.error(JSON.stringify(e));
       process.exit(1);
@@ -119,7 +118,8 @@ program
 
 program
   .command('verify')
-  .action(async () => {
+  .option('-s, --signature <signature>', 'Signature.')
+  .action(async ({signature}) => {
     try {
       const reqJson = await getHTTPMessage();
       const {
