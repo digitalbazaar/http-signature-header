@@ -38,18 +38,18 @@ async function getStdin(encoding = 'utf8') {
   });
 }
 
-async function getHttpMessage() {
-  const httpMessage = await getStdin();
-  if(!httpMessage) {
-    throw new Error('An Http Message must be passed to stdin.');
+async function getHTTPMessage() {
+  const HTTPMessage = await getStdin();
+  if(!HTTPMessage) {
+    throw new Error('An HTTP Message must be passed to stdin.');
   }
   // this will create a request or response object
   // similar to node's default request object.
-  const request = httpMessageParser(httpMessage);
+  const request = httpMessageParser(HTTPMessage);
   return request;
 }
 
-function makeHttpHeaders(headers = {}) {
+function makeHTTPHeaders(headers = {}) {
   let message = '';
   for(const key in headers) {
     let value = headers[key];
@@ -67,7 +67,7 @@ program
   .action(async () => {
     try {
       const {headers} = program;
-      const requestOptions = await getHttpMessage();
+      const requestOptions = await getHTTPMessage();
       if(!headers) {throw new Error(
         '--headers required for command c14n|cannonize' +
         'ex: --header date,etag');}
@@ -121,7 +121,7 @@ program
   .command('verify')
   .action(async () => {
     try {
-      const reqJson = await getHttpMessage();
+      const reqJson = await getHTTPMessage();
       const {
         headers,
         keyId,
@@ -148,11 +148,11 @@ program
   .version('0.0.1')
   .option('-H, --headers <headers>', 'A list of header names.')
   .option('-k, --keyId <keyId>', 'A Key Id string.')
-  .option('-pk, --private-key <privateKey>.',
+  .option('-private, --private-key <privateKey>.',
     'A private key file name filename.')
   .option('-pkt, --private-key-type <privateKeyType>',
     'The type of the private key.')
-  .option('-pk, --public-key <publicKey>.',
+  .option('-public, --public-key <publicKey>.',
     'A public key file name filename.')
   .option('-a, --algorithm [algorithm]',
     'One of: rsa-sha1, hmac-sha1, rsa-sha256, hmac-sha256, hs2019.',
