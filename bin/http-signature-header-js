@@ -147,16 +147,16 @@ program
 program
   .version('0.0.1')
   .option('-H, --headers <headers>', 'A list of header names.')
-  .option('-k, --keyId <keyId>', 'A Key Id string.')
-  .option('-private, --private-key <privateKey>.',
+  .option('-K, --keyId <keyId>', 'A Key Id string.')
+  .option('-P, --private-key <privateKey>.',
     'A private key file name filename.')
-  .option('-kt, --key-type <keyType>',
+  .option('-T, --key-type <keyType>',
     'The type of the keys.')
-  .option('-public, --public-key <publicKey>.',
+  .option('-U, --public-key <publicKey>.',
     'A public key file name filename.')
-  .option('-a, --algorithm [algorithm]',
+  .option('-A, --algorithm [algorithm]',
     'One of: rsa-sha1, hmac-sha1, rsa-sha256, hmac-sha256, hs2019.',
     /^(rsa-sha1|hmac-sha1|rsa-sha256|hmac-sha256|hs2019)$/i)
-  .option('-c, --created [created]', 'The created param for the signature.')
-  .option('-e, --expires [expires]', 'The expires param for the signature.')
+  .option('-C, --created [created]', 'The created param for the signature.')
+  .option('-E, --expires [expires]', 'The expires param for the signature.')
   .parse(process.argv);
