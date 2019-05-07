@@ -18,7 +18,7 @@ const readFile = util.promisify(fs.readFile);
  *
  * @returns {Promise<string>} Should return the http message.
  */
-async function getStdIn(encoding = 'utf8') {
+async function getStdin(encoding = 'utf8') {
   const {stdin} = process;
   let message = '';
   return new Promise((resolve, reject) => {
@@ -39,7 +39,7 @@ async function getStdIn(encoding = 'utf8') {
 }
 
 async function getHttpMessage() {
-  const httpMessage = await getStdIn();
+  const httpMessage = await getStdin();
   if(!httpMessage) {
     throw new Error('An Http Message must be passed to stdin.');
   }
@@ -49,8 +49,8 @@ async function getHttpMessage() {
   return request;
 }
 
-function makeHttpMessageOutgoing({status = '200 OK', version = '1.1', headers = {}}) {
-  let message = `HTTP/${version} ${status}`;
+function makeHttpHeaders(headers = {}) {
+  let message = '';
   for(const key in headers) {
     let value = headers[key];
     if(Array.isArray(value)) {
@@ -63,16 +63,18 @@ function makeHttpMessageOutgoing({status = '200 OK', version = '1.1', headers = 
 
 program
   .command('c14n')
-  .alias('C')
+  .alias('cannonize')
   .action(async () => {
     try {
       const {headers} = program;
       const requestOptions = await getHttpMessage();
-      if(!headers) {throw new Error('--headers required');}
-      const includeHeaders = program.headers ? program.headers.split(',') : '';
+      if(!headers) {throw new Error(
+        '--headers required for command c14n|cannonize' +
+        'ex: --header date,etag');}
+      const includeHeaders = program.headers ? program.headers.split(/\s/) : '';
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
-      console.log(JSON.stringify(result));
+      console.log(result);
       process.exit(0);
     } catch(e) {
       throw e;
@@ -82,7 +84,6 @@ program
 
 program
   .command('sign')
-  .alias('S')
   .option('-s, --signature <signature>', 'Signature.')
   .action(async cmd => {
     try {
@@ -97,7 +98,7 @@ program
         expires
       } = program;
       const privateKeyFile = await readFile(privateKey);
-      const includeHeaders = headers ? program.headers.split(',') : '';
+      const includeHeaders = headers ? program.headers.split(/\s/) : '';
       const options = {
         algorithm,
         includeHeaders,
@@ -118,7 +119,6 @@ program
 
 program
   .command('verify')
-  .alias('V')
   .action(async () => {
     try {
       const reqJson = await getHttpMessage();
@@ -126,12 +126,13 @@ program
         headers,
         keyId,
         privateKey,
+        publicKey,
         privateKeyType,
         algorithm,
         created,
         expires
       } = program;
-      const privateKeyFile = await readFile(privateKey);
+      const publicKeyFile = await readFile(publicKey);
       // TODO: abstract middleware verify in this.
       // TODO: get options from program env variables.
       throw new Error('Not implemented yet.')
@@ -146,11 +147,13 @@ program
 program
   .version('0.0.1')
   .option('-H, --headers <headers>', 'A list of header names.')
-  .option('-k, --keyId <keyId>', 'A Key Id <string>.')
+  .option('-k, --keyId <keyId>', 'A Key Id string.')
   .option('-pk, --private-key <privateKey>.',
-    'A private key file name <filename>.')
-  .option('-pkt, --private-key-type <privateKeyType',
+    'A private key file name filename.')
+  .option('-pkt, --private-key-type <privateKeyType>',
     'The type of the private key.')
+  .option('-pk, --public-key <publicKey>.',
+    'A public key file name filename.')
   .option('-a, --algorithm [algorithm]',
     'One of: rsa-sha1, hmac-sha1, rsa-sha256, hmac-sha256, hs2019.',
     /^(rsa-sha1|hmac-sha1|rsa-sha256|hmac-sha256|hs2019)$/i)
