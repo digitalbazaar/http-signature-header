@@ -91,7 +91,7 @@ program
         headers,
         keyId,
         privateKey,
-        privateKeyType,
+        keyType,
         algorithm,
         created,
         expires
@@ -127,7 +127,7 @@ program
         keyId,
         privateKey,
         publicKey,
-        privateKeyType,
+        keyType,
         algorithm,
         created,
         expires
@@ -150,8 +150,8 @@ program
   .option('-k, --keyId <keyId>', 'A Key Id string.')
   .option('-private, --private-key <privateKey>.',
     'A private key file name filename.')
-  .option('-pkt, --private-key-type <privateKeyType>',
-    'The type of the private key.')
+  .option('-kt, --key-type <keyType>',
+    'The type of the keys.')
   .option('-public, --public-key <publicKey>.',
     'A public key file name filename.')
   .option('-a, --algorithm [algorithm]',
