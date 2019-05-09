@@ -88,7 +88,7 @@ program
 
 program
   .command('sign')
-  .action(async cmd => {
+  .action(async () => {
     try {
       const {
         headers,
@@ -101,47 +101,47 @@ program
       } = program;
       const privateKeyFile = await readFile(privateKey);
       const includeHeaders = headers ? program.headers.split(/\s/) : '';
+      const requestOptions = await getHTTPMessage();
       const options = {
+        keyId,
         algorithm,
         includeHeaders,
         keyId,
-        signature
+        requestOptions,
+        privateKey: privateKeyFile
       };
-      // TODO: fix sign function
-      // sign function comes from:
-      // https://github.com/digitalbazaar/bedrock-test/blob/master/lib/helpers.js#L22
-      const result = httpSigs.createAuthzHeader(options);
-     /**
-      * Add HTTPSignatures headers to a given `requestOptions` object.  This is
-      * compatible with both `request` and `axios` libraries.
-      *
-      * @param algorithm the signing algorithm to use (e.g. rsa-sha256, ed25519).
-      * @param identity the identity as typically constructed in mock.data.js
-      * @param requestOptions the request options.
-     */
+      /**
+       * Add HTTPSignatures headers to a given `requestOptions` object.
+       * This is compatible with both `request` and `axios` libraries.
+       *
+       * @param {string} algorithm -
+       * The signing algorithm to use (e.g. rsa-sha256, ed25519).
+       * @param {Object} identity -
+       * The identity as typically constructed in mock.data.js.
+       * @param {Object} requestOptions -
+       * The request options.
+      */
       const createHttpSignatureRequest = async (
-        {algorithm, identity, requestOptions, includeHeaders = []}) => {
+        {algorithm, privateKey, keyId,
+          requestOptions, includeHeaders = []}) => {
         requestOptions.headers = requestOptions.headers || {};
         if(!requestOptions.headers.date) {
           requestOptions.headers.date = jsprim.rfc1123(new Date());
         }
         const plaintext = httpSigs.createSignatureString(
           {includeHeaders, requestOptions});
-        const keyId = identity.keys.publicKey.id;
         const authzHeaderOptions = {includeHeaders, keyId};
         const cryptoOptions = {plaintext};
         if(algorithm.startsWith('rsa')) {
           authzHeaderOptions.algorithm = algorithm;
           const alg = algorithm.split('-');
-          const {privateKeyPem} = identity.keys.privateKey;
           cryptoOptions.algorithm = alg[0];
-          cryptoOptions.privateKeyPem = privateKeyPem;
+          cryptoOptions.privateKeyPem = privateKey;
           cryptoOptions.hashType = alg[1];
         }
         if(algorithm === 'ed25519') {
-          const {privateKeyBase58} = identity.keys.privateKey;
           cryptoOptions.algorithm = algorithm;
-          cryptoOptions.privateKeyBase58 = privateKeyBase58;
+          cryptoOptions.privateKeyBase58 = privateKey;
         }
         authzHeaderOptions.signature =
           await signatureAlgorithms.sign(cryptoOptions);
@@ -149,9 +149,10 @@ program
           authzHeaderOptions);
         return requestOptions.headers;
       };
-
-      throw new Error('command sign has not been implemented yet');
-      console.log(result);
+      const result = await createHttpSignatureRequest(options);
+      const message = makeHTTPHeaders(result);
+      console.log(message);
+      process.exit(0);
     } catch(e) {
       console.error(JSON.stringify(e));
       process.exit(1);
