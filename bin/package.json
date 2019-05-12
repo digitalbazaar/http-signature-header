@@ -18,5 +18,8 @@
     "http-signature-middleware": "^1.1.0",
     "jsprim": "^2.0.0",
     "signature-algorithms": "^1.0.0"
+  },
+  "dependencies": {
+    "bs58": "^4.0.1"
   }
 }
