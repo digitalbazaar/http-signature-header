@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+/**
+ * Copyright (c) 2018-2019 Digital Bazaar, Inc. All rights reserved.
+*/
+
 const program = require('commander');
 const httpSigs = require('../lib/');
 const fs = require('fs');
@@ -50,8 +54,7 @@ async function getHTTPMessage() {
   }
   // this will create a request or response object
   // similar to node's default request object.
-  const request = httpMessageParser(HTTPMessage);
-  return request;
+  return httpMessageParser(HTTPMessage);
 }
 
 function makeHTTPHeaders(headers = {}) {
@@ -68,7 +71,7 @@ function makeHTTPHeaders(headers = {}) {
 
 program
   .command('c14n')
-  .alias('cannonize')
+  .alias('canonize')
   .action(async () => {
     try {
       const {headers} = program;
@@ -133,11 +136,12 @@ program
           {includeHeaders, requestOptions});
         const authzHeaderOptions = {includeHeaders, keyId};
         const cryptoOptions = {plaintext};
+        // TODO: get algorithm and has type from keyId metadata
         if(algorithm.startsWith('rsa')) {
           authzHeaderOptions.algorithm = algorithm;
           const alg = algorithm.split('-');
           cryptoOptions.algorithm = alg[0];
-          cryptoOptions.privateKeyPem = privateKey;
+          cryptoOptions.privateKeyPem = privateKey.toString();
           cryptoOptions.hashType = alg[1];
         }
         if(algorithm === 'ed25519') {
