@@ -11,7 +11,7 @@
     "email": "support@digitalbazaar.com",
     "url": "https://digitalbazaar.com/"
   },
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "devDependencies": {
     "commander": "^2.20.0",
     "http-message-parser": "0.0.34",
