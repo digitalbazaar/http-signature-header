@@ -115,19 +115,25 @@ program
         privateKey: privateKeyFile
       };
       /**
-       * Add HTTPSignatures headers to a given `requestOptions` object.
-       * This is compatible with both `request` and `axios` libraries.
+       * Add HTTPSignatures headers to a given requestOptions object.
+       * This is compatible with both request and axios libraries.
        *
-       * @param {string} algorithm -
-       * The signing algorithm to use (e.g. rsa-sha256, ed25519).
-       * @param {Object} identity -
-       * The identity as typically constructed in mock.data.js.
-       * @param {Object} requestOptions -
-       * The request options.
+       * @param {Object} options - Options for the request.
+       * @param {string} options.algorithm - The signing algorithm
+       * to use (rsa-sha256, ed25519).
+       * @param {Object} options.requestOptions - The request options.
+       * @param {string} options.keyId - A valid IRI
+       * that resolves to a public key.
+       * @param {Array<string>} options.includeHeaders - Which headers
+       * to use in the Signing String.
+       *
+       * @returns {Object} The response headers.
       */
       const createHttpSignatureRequest = async (
         {algorithm = 'ed25519', privateKey, keyId,
           requestOptions, includeHeaders = []}) => {
+        // get metadata from public key
+        // const publicKey = await readFile(keyId);
         requestOptions.headers = requestOptions.headers || {};
         if(!requestOptions.headers.date) {
           requestOptions.headers.date = jsprim.rfc1123(new Date());
@@ -165,6 +171,7 @@ program
     }
   });
 
+// TODO implement verify
 program
   .command('verify')
   .option('-s, --signature <signature>', 'Signature.')
