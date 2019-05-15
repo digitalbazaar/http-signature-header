@@ -61,6 +61,20 @@ function makeHTTPHeaders(headers = {}) {
   return message;
 }
 
+const hs2019 = {
+  hash: crypto.createHash('SHA512'),
+  dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ecdsa/i, /^p256/i],
+  validKey(key) {
+    return hs2019.dsa
+      .reduce((any, current) => {
+        if(any) {
+          return any;
+        }
+        return current.test(key);
+      }, false);
+  }
+};
+
 function getHTTPSignatureAlgorithm(algorithm) {
   if(algorithm === true) {
     throw new Error(
@@ -68,10 +82,7 @@ function getHTTPSignatureAlgorithm(algorithm) {
   }
   switch(algorithm.toLowerCase()) {
     case 'hs2019': {
-      return {
-        hash: crypto.createHash('SHA512'),
-        dsa: ['rsa', 'hmac', 'ed', 'ecdsa', 'p']
-      };
+      return hs2019;
     }
     default: {
       throw new Error(`${algorithm} is deprecated or unsupported}`);
@@ -135,13 +146,7 @@ const createHttpSignatureRequest = async (
   // Ed25519ph, Ed25519ctx,
   // ANSI X9.62-2005
   const keyTypes = keyType.trim().toLowerCase();
-  const valid = httpSignatureAlgorithm.dsa
-    .reduce((any, current) => {
-      if(any) {
-        return any;
-      }
-      return keyTypes.startsWith(current);
-    }, false);
+  const valid = httpSignatureAlgorithm.validKey(keyTypes);
   if(!valid) {
     throw new Error(`Unsupported signing algorithm ${keyType}`);
   }
@@ -197,12 +202,52 @@ exports.sign = async function(program) {
 };
 
 exports.verify = async function(program) {
-  const reqJson = await getHTTPMessage();
+  /**
+ * 1. recreate the canonzied string (not hashed, not signed, not base 64)
+ * 1a. might need to hash canonized
+ * 2. get the public key from key id
+ * 3. if there is an algorithm check key is in types
+ * 4. decode the actual `signature` paramter to bytes (not base 64)
+ * 5. pass publicKey, canonziedString, and decoded signature bytes to verify
+ */
+  const requestOptions = await getHTTPMessage();
   const {
-    headers, keyId, privateKey, publicKey,
-    keyType, algorithm, created, expires
+    headers = '', keyType, publicKey,
+    algorithm = 'hs2019'
   } = program;
+  validate(program);
+  const includeHeaders = headers.split(/\s+/);
+  let canonicalizedString = httpSigs.
+    createSignatureString({includeHeaders, requestOptions});
   const publicKeyFile = await readFile(publicKey);
+  const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
+  const valid = httpSignatureAlgorithm.validKey(keyType);
+  if(!valid) {
+    throw new Error(`Unsupported signing algorithm ${keyType}`);
+  }
+  const options = {
+    authorizationHeaderName: 'Authorization',
+    headers: includeHeaders
+  };
+  const request = httpSigs.parseRequest(requestOptions, options);
+  const signature = new Buffer(request.params.signature, 'base64');
+  if(!signature) {
+    throw new Error('No signature parameter found in Authorization header');
+  }
+  if(!request.params.keyId) {
+    throw new Error('keyId is required for verification.');
+  }
+  if(httpSignatureAlgorithm.hash) {
+    httpSignatureAlgorithm.hash.update(canonicalizedString);
+    canonicalizedString = Buffer.from(
+      httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
+  }
   // TODO: abstract middleware verify in this.
   // TODO: get options from program env variables.
+  const verified = crypto.verify(
+    null, canonicalizedString, publicKeyFile, signature);
+  if(verified) {
+    return canonicalizedString.toString('utf8');
+  }
+  return 'Signature verification failed.';
 };
