@@ -1,4 +1,4 @@
 #!/bin/sh
 
-$(dirname $0)/http-signature-header-js verify $@
+$(dirname $0)/http-signature-header-js verify "$@"
 

@@ -4,89 +4,21 @@
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
 */
 
+// this module is the binary used by the http signature spec test stuies
+// @see https://github.com/w3c-dvcg/http-signatures-test-suite
 const program = require('commander');
-const httpSigs = require('../lib/');
-const fs = require('fs');
-const util = require('util');
-const httpMessageParser = require('http-message-parser');
-const jsprim = require('jsprim');
-const signatureAlgorithms = require('signature-algorithms');
-const bs58 = require('bs58');
-
-// this can be use to await paths to private keys and other files.
-// also can get be used to dereference keyId in middleware
-const readFile = util.promisify(fs.readFile);
-
-/**
- * Simple wrapper around node's process.stdin.
- * This allows us to get the result of cat and other commands.
- *
- * @param {string} [encoding='utf8'] - The http message's encoding.
- *
- * @returns {Promise<string>} Should return the http message.
- */
-async function getStdin(encoding = 'utf8') {
-  const {stdin} = process;
-  let message = '';
-  return new Promise((resolve, reject) => {
-    try {
-      stdin.setEncoding(encoding);
-      stdin.on('readable', () => {
-        let chunk;
-        while((chunk = stdin.read())) {
-          message += chunk;
-        }
-      });
-      stdin.on('end', () => resolve(message));
-      stdin.on('error', reject);
-    }
-    catch(e) {
-      reject(e);
-    }
-  });
-}
-
-async function getHTTPMessage() {
-  const HTTPMessage = await getStdin();
-  if(!HTTPMessage) {
-    throw new Error(
-      'An HTTP Message must be passed to stdin for this command.');
-  }
-  // this will create a request or response object
-  // similar to node's default request object.
-  return httpMessageParser(HTTPMessage);
-}
-
-function makeHTTPHeaders(headers = {}) {
-  let message = '';
-  for(const key in headers) {
-    let value = headers[key];
-    if(Array.isArray(value)) {
-      value = value.join(',');
-    }
-    message += `${key}: ${value}\n`;
-  }
-  return message;
-}
+const {canonicalize, sign, verify} = require('./util');
 
 program
   .command('c14n')
   .alias('canonicalize')
   .action(async () => {
     try {
-      const {headers} = program;
-      const requestOptions = await getHTTPMessage();
-      if(!headers) {throw new Error(
-        '--headers required for command c14n|canonicalize' +
-        'ex: --header date,etag');}
-      const includeHeaders =
-        program.headers ? program.headers.split(/\s+/) : '';
-      const result = httpSigs.
-        createSignatureString({includeHeaders, requestOptions});
-      console.log(result);
+      const result = await canonicalize(program);
+      process.stdout.write(result);
       process.exit(0);
     } catch(e) {
-      console.error('c14n command failed : ' + e);
+      console.error('canonicalize command failed : ' + e);
       process.exit(1);
     }
   });
@@ -95,74 +27,11 @@ program
   .command('sign')
   .action(async () => {
     try {
-      const {
-        headers, keyId, privateKey, keyType,
-        algorithm, created, expires
-      } = program;
-      const privateKeyFile = await readFile(privateKey);
-      const includeHeaders = headers ? program.headers.split(/\s+/) : '';
-      const requestOptions = await getHTTPMessage();
-      const options = {
-        keyId,
-        algorithm,
-        includeHeaders,
-        keyId,
-        requestOptions,
-        privateKey: privateKeyFile
-      };
-      /**
-       * Add HTTPSignatures headers to a given requestOptions object.
-       * This is compatible with both request and axios libraries.
-       * TODO: factor out to new npm package
-       *
-       * @param {Object} options - Options for the request.
-       * @param {string} options.algorithm - The signing algorithm
-       * to use (rsa-sha256, hs2019).
-       * @param {Object} options.requestOptions - The request options.
-       * @param {string} options.keyId - A valid IRI
-       * that resolves to a public key.
-       * @param {Array<string>} options.includeHeaders - Which headers
-       * to use in the Signing String.
-       *
-       * @returns {Object} The response headers.
-      */
-      const createHttpSignatureRequest = async (
-        {algorithm = 'hs2019', privateKey, keyId,
-          requestOptions, includeHeaders = []}) => {
-        // get metadata from public key
-        // const publicKey = await readFile(keyId);
-        requestOptions.headers = requestOptions.headers || {};
-        if(!requestOptions.headers.date) {
-          requestOptions.headers.date = jsprim.rfc1123(new Date());
-        }
-        const plaintext = httpSigs.createSignatureString(
-          {includeHeaders, requestOptions});
-        const authzHeaderOptions = {includeHeaders, keyId};
-        const cryptoOptions = {plaintext};
-        // TODO: get algorithm and has type from keyId metadata
-        if(algorithm.startsWith('rsa')) {
-          authzHeaderOptions.algorithm = algorithm;
-          const alg = algorithm.split('-');
-          cryptoOptions.algorithm = alg[0];
-          cryptoOptions.privateKeyPem = privateKey.toString();
-          cryptoOptions.hashType = alg[1];
-        }
-        if(algorithm === 'ed25519') {
-          cryptoOptions.algorithm = algorithm;
-          cryptoOptions.privateKeyBase58 = bs58.encode(privateKey);
-        }
-        authzHeaderOptions.signature =
-          await signatureAlgorithms.sign(cryptoOptions);
-        requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
-          authzHeaderOptions);
-        return requestOptions.headers;
-      };
-      const result = await createHttpSignatureRequest(options);
-      const message = makeHTTPHeaders(result);
-      console.log(message);
+      const result = await sign(program);
+      process.stdout.write(result);
       process.exit(0);
     } catch(e) {
-      console.error('Sign Error', JSON.stringify(e));
+      console.error('Sign Error', e);
       process.exit(1);
     }
   });
@@ -172,18 +41,11 @@ program
   .command('verify')
   .action(async () => {
     try {
-      const reqJson = await getHTTPMessage();
-      const {
-        headers, keyId, privateKey, publicKey,
-        keyType, algorithm, created, expires
-      } = program;
-      const publicKeyFile = await readFile(publicKey);
-      // TODO: abstract middleware verify in this.
-      // TODO: get options from program env variables.
-      throw new Error('Command verify has not been implemented yet.');
+      const result = await verify(program);
+      process.stdout.write(String(result));
       process.exit(0);
     } catch(e) {
-      console.error('Verification Error:', JSON.stringify(e, null, e), e);
+      console.error('Verification Error:', e);
       process.exit(1);
     }
   });
