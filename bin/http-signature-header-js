@@ -18,7 +18,7 @@ program
       process.stdout.write(result);
       process.exit(0);
     } catch(e) {
-      console.error('c14n command failed : ' + e);
+      console.error('canonicalize command failed : ' + e);
       process.exit(1);
     }
   });
