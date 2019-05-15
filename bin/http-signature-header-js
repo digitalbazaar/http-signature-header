@@ -5,6 +5,7 @@
 */
 
 const program = require('commander');
+const {createHash} = require('crypto');
 const httpSigs = require('../lib/');
 const fs = require('fs');
 const util = require('util');
@@ -46,6 +47,18 @@ async function getStdin(encoding = 'utf8') {
   });
 }
 
+/**
+ * Gets a file then converts it to json.
+ *
+ * @param {string} file - File path.
+ *
+ * @returns {Object} The json object.
+ */
+async function getJSON(file) {
+  const keyData = await readFile(file);
+  return JSON.parse(keyData);
+}
+
 async function getHTTPMessage() {
   const HTTPMessage = await getStdin();
   if(!HTTPMessage) {
@@ -67,6 +80,40 @@ function makeHTTPHeaders(headers = {}) {
     message += `${key}: ${value}\n`;
   }
   return message;
+}
+
+function getHTTPSignatureAlgorithm(algorithm) {
+  switch(algorithm.toLowerCase()) {
+    case 'hs2019': {
+      return {
+        hash: createHash('sha512'),
+        dsa: ['rsa', 'hmac', 'ed']
+      };
+    }
+    default: {
+      throw new Error(`${algorithm} is either deprecated or unsupported}`);
+    }
+  }
+}
+
+/**
+ * Runs validates on various fields.
+ *
+ * @param {Object} options - command line options.
+ */
+function validate(options) {
+  const now = Date.now();
+  if(!isNaN(program.created)) {
+    if(program.created > now) {
+      throw new Error(
+        'Invalid created. Your created parameter is in the future');
+    }
+  }
+  if(!isNaN(program.expires)) {
+    if(program.expires < now) {
+      throw new Error('Your signature has expired.');
+    }
+  }
 }
 
 program
@@ -99,6 +146,7 @@ program
         headers, keyId, privateKey, keyType,
         algorithm, created, expires
       } = program;
+      validate(program);
       const privateKeyFile = await readFile(privateKey);
       const includeHeaders = headers ? program.headers.split(/\s+/) : '';
       const requestOptions = await getHTTPMessage();
@@ -130,25 +178,33 @@ program
         {algorithm = 'hs2019', privateKey, keyId,
           requestOptions, includeHeaders = []}) => {
         // get metadata from public key
-        // const publicKey = await readFile(keyId);
+        const {authentication} = await getJSON(keyId);
+        const [{type: publicKeyType}] = authentication;
+        if(!publicKeyType) {
+          throw new Error('Expected public key to have key type metadata');
+        }
         requestOptions.headers = requestOptions.headers || {};
         if(!requestOptions.headers.date) {
           requestOptions.headers.date = jsprim.rfc1123(new Date());
         }
+        const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
         const plaintext = httpSigs.createSignatureString(
           {includeHeaders, requestOptions});
+        const hashedText = httpSignatureAlgorithm.hash.update(plaintext);
         const authzHeaderOptions = {includeHeaders, keyId};
-        const cryptoOptions = {plaintext};
-        // TODO: get algorithm and has type from keyId metadata
-        if(algorithm.startsWith('rsa')) {
-          authzHeaderOptions.algorithm = algorithm;
-          const alg = algorithm.split('-');
+        const cryptoOptions = {plaintext: hashedText.digest('base64')};
+        // TODO add signing support for HMAC, ECDSA, P-256,
+        // Ed25519ph, Ed25519ctx, and Ed25519
+        // ANSI X9.62-2005
+        if(publicKeyType.startsWith('rsa')) {
+          authzHeaderOptions.algorithm = publicKeyType;
+          const alg = publicKeyType.split('-');
           cryptoOptions.algorithm = alg[0];
           cryptoOptions.privateKeyPem = privateKey.toString();
           cryptoOptions.hashType = alg[1];
         }
-        if(algorithm === 'ed25519') {
-          cryptoOptions.algorithm = algorithm;
+        if(publicKeyType === 'ed25519') {
+          cryptoOptions.algorithm = publicKeyType;
           cryptoOptions.privateKeyBase58 = bs58.encode(privateKey);
         }
         authzHeaderOptions.signature =
