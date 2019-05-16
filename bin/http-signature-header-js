@@ -85,7 +85,7 @@ program
       console.log(result);
       process.exit(0);
     } catch(e) {
-      throw e;
+      console.error(e);
       process.exit(1);
     }
   });
