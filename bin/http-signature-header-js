@@ -86,7 +86,7 @@ program
       console.log(result);
       process.exit(0);
     } catch(e) {
-      console.error(e);
+      console.error('c14n command failed : ' + e);
       process.exit(1);
     }
   });
@@ -113,6 +113,7 @@ program
       /**
        * Add HTTPSignatures headers to a given requestOptions object.
        * This is compatible with both request and axios libraries.
+       * TODO: factor out to new npm package
        *
        * @param {Object} options - Options for the request.
        * @param {string} options.algorithm - The signing algorithm
@@ -170,24 +171,17 @@ program
 // TODO implement verify
 program
   .command('verify')
-  .option('-s, --signature <signature>', 'Signature.')
-  .action(async ({signature}) => {
+  .action(async () => {
     try {
       const reqJson = await getHTTPMessage();
       const {
-        headers,
-        keyId,
-        privateKey,
-        publicKey,
-        keyType,
-        algorithm,
-        created,
-        expires
+        headers, keyId, privateKey, publicKey,
+        keyType, algorithm, created, expires
       } = program;
       const publicKeyFile = await readFile(publicKey);
       // TODO: abstract middleware verify in this.
       // TODO: get options from program env variables.
-      throw new Error('command verify Not implemented yet.');
+      throw new Error('Command verify has not been implemented yet.');
       process.exit(0);
     } catch(e) {
       console.error('Error:', JSON.stringify(e, null, e), e);
