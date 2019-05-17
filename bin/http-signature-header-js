@@ -71,15 +71,16 @@ function makeHTTPHeaders(headers = {}) {
 
 program
   .command('c14n')
-  .alias('canonize')
+  .alias('canonicalize')
   .action(async () => {
     try {
       const {headers} = program;
       const requestOptions = await getHTTPMessage();
       if(!headers) {throw new Error(
-        '--headers required for command c14n|canonize' +
+        '--headers required for command c14n|canonicalize' +
         'ex: --header date,etag');}
-      const includeHeaders = program.headers ? program.headers.split(/\s+/) : '';
+      const includeHeaders =
+        program.headers ? program.headers.split(/\s+/) : '';
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
       console.log(result);
