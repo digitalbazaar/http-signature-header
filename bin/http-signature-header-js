@@ -77,7 +77,7 @@ program
       const {headers} = program;
       const requestOptions = await getHTTPMessage();
       if(!headers) {throw new Error(
-        '--headers required for command c14n|cannonize' +
+        '--headers required for command c14n|canonize' +
         'ex: --header date,etag');}
       const includeHeaders = program.headers ? program.headers.split(/\s+/) : '';
       const result = httpSigs.
