@@ -79,7 +79,7 @@ program
       if(!headers) {throw new Error(
         '--headers required for command c14n|cannonize' +
         'ex: --header date,etag');}
-      const includeHeaders = program.headers ? program.headers.split(/\s/) : '';
+      const includeHeaders = program.headers ? program.headers.split(/\s+/) : '';
       const result = httpSigs.
         createSignatureString({includeHeaders, requestOptions});
       console.log(result);
@@ -104,7 +104,7 @@ program
         expires
       } = program;
       const privateKeyFile = await readFile(privateKey);
-      const includeHeaders = headers ? program.headers.split(/\s/) : '';
+      const includeHeaders = headers ? program.headers.split(/\s+/) : '';
       const requestOptions = await getHTTPMessage();
       const options = {
         keyId,
