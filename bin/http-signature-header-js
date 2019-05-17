@@ -96,13 +96,8 @@ program
   .action(async () => {
     try {
       const {
-        headers,
-        keyId,
-        privateKey,
-        keyType,
-        algorithm,
-        created,
-        expires
+        headers, keyId, privateKey, keyType,
+        algorithm, created, expires
       } = program;
       const privateKeyFile = await readFile(privateKey);
       const includeHeaders = headers ? program.headers.split(/\s+/) : '';
@@ -121,7 +116,7 @@ program
        *
        * @param {Object} options - Options for the request.
        * @param {string} options.algorithm - The signing algorithm
-       * to use (rsa-sha256, ed25519).
+       * to use (rsa-sha256, hs2019).
        * @param {Object} options.requestOptions - The request options.
        * @param {string} options.keyId - A valid IRI
        * that resolves to a public key.
@@ -131,7 +126,7 @@ program
        * @returns {Object} The response headers.
       */
       const createHttpSignatureRequest = async (
-        {algorithm = 'ed25519', privateKey, keyId,
+        {algorithm = 'hs2019', privateKey, keyId,
           requestOptions, includeHeaders = []}) => {
         // get metadata from public key
         // const publicKey = await readFile(keyId);
