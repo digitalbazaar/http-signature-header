@@ -81,15 +81,19 @@ function makeHTTPHeaders(headers = {}) {
 }
 
 function getHTTPSignatureAlgorithm(algorithm) {
+  if(algorithm === true) {
+    throw new Error(
+      'Your algorithm is not in the current HTTP Signatures registry');
+  }
   switch(algorithm.toLowerCase()) {
     case 'hs2019': {
       return {
         hash: crypto.createHash('SHA512'),
-        dsa: ['rsa', 'hmac', 'ed', 'ECDSA']
+        dsa: ['rsa', 'hmac', 'ed', 'ecdsa']
       };
     }
     default: {
-      throw new Error(`${algorithm} is either deprecated or unsupported}`);
+      throw new Error(`${algorithm} is deprecated or unsupported}`);
     }
   }
 }
@@ -202,10 +206,11 @@ program
             return keyType.startsWith(current);
           }, false);
         if(!valid) {
-          throw new Error(`Unsupported signature algorithm ${keyType}`);
+          throw new Error(`Unsupported signing algorithm ${keyType}`);
         }
         const keyObj = crypto.createPrivateKey(privateKey);
-        const hashText = Buffer.from(httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
+        const hashText = Buffer.from(
+          httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
         authzHeaderOptions.signature =
           await crypto.sign(null, hashText, keyObj).toString('base64');
         requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
