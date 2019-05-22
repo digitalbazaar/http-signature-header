@@ -5,7 +5,7 @@
 */
 
 const program = require('commander');
-const {createHash} = require('crypto');
+const crypto = require('crypto');
 const httpSigs = require('../lib/');
 const fs = require('fs');
 const util = require('util');
@@ -86,8 +86,8 @@ function getHTTPSignatureAlgorithm(algorithm) {
   switch(algorithm.toLowerCase()) {
     case 'hs2019': {
       return {
-        hash: createHash('sha512'),
-        dsa: ['rsa', 'hmac', 'ed']
+        sign: crypto.createSign('SHA512'),
+        dsa: ['rsa', 'hmac', 'ed', 'ECDSA']
       };
     }
     default: {
@@ -99,18 +99,18 @@ function getHTTPSignatureAlgorithm(algorithm) {
 /**
  * Runs validates on various fields.
  *
- * @param {Object} options - command line options.
+ * @param {Object} options - Command line options.
  */
 function validate(options) {
   const now = Date.now();
-  if(!isNaN(program.created)) {
-    if(program.created > now) {
+  if(!isNaN(options.created)) {
+    if(options.created > now) {
       throw new Error(
         'Invalid created. Your created parameter is in the future');
     }
   }
-  if(!isNaN(program.expires)) {
-    if(program.expires < now) {
+  if(!isNaN(options.expires)) {
+    if(options.expires < now) {
       throw new Error('Your signature has expired.');
     }
   }
@@ -143,8 +143,8 @@ program
   .action(async () => {
     try {
       const {
-        headers, keyId, privateKey, keyType,
-        algorithm, created, expires
+        headers, keyId, privateKey,
+        algorithm
       } = program;
       validate(program);
       const privateKeyFile = await readFile(privateKey);
@@ -161,7 +161,7 @@ program
       /**
        * Add HTTPSignatures headers to a given requestOptions object.
        * This is compatible with both request and axios libraries.
-       * TODO: factor out to new npm package
+       * TODO: factor out to new npm package.
        *
        * @param {Object} options - Options for the request.
        * @param {string} options.algorithm - The signing algorithm
@@ -190,25 +190,25 @@ program
         const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
         const plaintext = httpSigs.createSignatureString(
           {includeHeaders, requestOptions});
-        const hashedText = httpSignatureAlgorithm.hash.update(plaintext);
+        httpSignatureAlgorithm.sign.write(plaintext);
+        httpSignatureAlgorithm.sign.end();
         const authzHeaderOptions = {includeHeaders, keyId};
-        const cryptoOptions = {plaintext: hashedText.digest('base64')};
         // TODO add signing support for HMAC, ECDSA, P-256,
         // Ed25519ph, Ed25519ctx, and Ed25519
         // ANSI X9.62-2005
-        if(publicKeyType.startsWith('rsa')) {
-          authzHeaderOptions.algorithm = publicKeyType;
-          const alg = publicKeyType.split('-');
-          cryptoOptions.algorithm = alg[0];
-          cryptoOptions.privateKeyPem = privateKey.toString();
-          cryptoOptions.hashType = alg[1];
-        }
-        if(publicKeyType === 'ed25519') {
-          cryptoOptions.algorithm = publicKeyType;
-          cryptoOptions.privateKeyBase58 = bs58.encode(privateKey);
+        const keyType = publicKeyType.trim().toLowerCase();
+        const valid = httpSignatureAlgorithm.dsa
+          .reduce((any, current) => {
+            if(any) {
+              return any;
+            }
+            return keyType.startsWith(current);
+          }, false);
+        if(!valid) {
+          throw new Error(`Unsupported signature algorithm ${keyType}`);
         }
         authzHeaderOptions.signature =
-          await signatureAlgorithms.sign(cryptoOptions);
+          await httpSignatureAlgorithm.sign.sign(privateKey, 'base64');
         requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
           authzHeaderOptions);
         return requestOptions.headers;
@@ -218,6 +218,7 @@ program
       console.log(message);
       process.exit(0);
     } catch(e) {
+      console.error(e);
       console.error('Sign Error', JSON.stringify(e));
       process.exit(1);
     }
