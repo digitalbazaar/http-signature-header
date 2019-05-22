@@ -11,8 +11,6 @@ const fs = require('fs');
 const util = require('util');
 const httpMessageParser = require('http-message-parser');
 const jsprim = require('jsprim');
-const signatureAlgorithms = require('signature-algorithms');
-const bs58 = require('bs58');
 
 // this can be use to await paths to private keys and other files.
 // also can get be used to dereference keyId in middleware
@@ -86,7 +84,7 @@ function getHTTPSignatureAlgorithm(algorithm) {
   switch(algorithm.toLowerCase()) {
     case 'hs2019': {
       return {
-        sign: crypto.createSign('SHA512'),
+        hash: crypto.createHash('SHA512'),
         dsa: ['rsa', 'hmac', 'ed', 'ECDSA']
       };
     }
@@ -190,8 +188,7 @@ program
         const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
         const plaintext = httpSigs.createSignatureString(
           {includeHeaders, requestOptions});
-        httpSignatureAlgorithm.sign.write(plaintext);
-        httpSignatureAlgorithm.sign.end();
+        httpSignatureAlgorithm.hash.update(plaintext);
         const authzHeaderOptions = {includeHeaders, keyId};
         // TODO add signing support for HMAC, ECDSA, P-256,
         // Ed25519ph, Ed25519ctx, and Ed25519
@@ -207,8 +204,10 @@ program
         if(!valid) {
           throw new Error(`Unsupported signature algorithm ${keyType}`);
         }
+        const keyObj = crypto.createPrivateKey(privateKey);
+        const hashText = Buffer.from(httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
         authzHeaderOptions.signature =
-          await httpSignatureAlgorithm.sign.sign(privateKey, 'base64');
+          await crypto.sign(null, hashText, keyObj).toString('base64');
         requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
           authzHeaderOptions);
         return requestOptions.headers;
@@ -219,7 +218,7 @@ program
       process.exit(0);
     } catch(e) {
       console.error(e);
-      console.error('Sign Error', JSON.stringify(e));
+      //console.error('Sign Error', JSON.stringify(e));
       process.exit(1);
     }
   });
