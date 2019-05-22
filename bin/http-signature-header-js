@@ -210,7 +210,7 @@ program
         }
         const keyObj = crypto.createPrivateKey(privateKey);
         if(keyType === 'hmac') {
-          authzHeaderOptions.signature = crypto.createHmac('SHA512', keyObj)
+          authzHeaderOptions.signature = crypto.createHmac('SHA512', privateKey)
             .update(plaintext).digest('base64');
         } else {
           const hashText = Buffer.from(
