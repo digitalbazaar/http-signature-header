@@ -227,8 +227,7 @@ program
       console.log(message);
       process.exit(0);
     } catch(e) {
-      console.error(e);
-      //console.error('Sign Error', JSON.stringify(e));
+      console.error('Sign Error', e);
       process.exit(1);
     }
   });
@@ -249,7 +248,7 @@ program
       throw new Error('Command verify has not been implemented yet.');
       process.exit(0);
     } catch(e) {
-      console.error('Verification Error:', JSON.stringify(e, null, e), e);
+      console.error('Verification Error:', e);
       process.exit(1);
     }
   });
