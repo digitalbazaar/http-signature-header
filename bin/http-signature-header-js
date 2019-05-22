@@ -194,8 +194,8 @@ program
           {includeHeaders, requestOptions});
         httpSignatureAlgorithm.hash.update(plaintext);
         const authzHeaderOptions = {includeHeaders, keyId};
-        // TODO add signing support for HMAC, ECDSA, P-256,
-        // Ed25519ph, Ed25519ctx, and Ed25519
+        // TODO add signing support for HMAC, P-256,
+        // Ed25519ph, Ed25519ctx,
         // ANSI X9.62-2005
         const keyType = publicKeyType.trim().toLowerCase();
         const valid = httpSignatureAlgorithm.dsa
@@ -209,10 +209,15 @@ program
           throw new Error(`Unsupported signing algorithm ${keyType}`);
         }
         const keyObj = crypto.createPrivateKey(privateKey);
-        const hashText = Buffer.from(
-          httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
-        authzHeaderOptions.signature =
-          await crypto.sign(null, hashText, keyObj).toString('base64');
+        if(keyType === 'hmac') {
+          authzHeaderOptions.signature = crypto.createHmac('SHA512', keyObj)
+            .update(plaintext).digest('base64');
+        } else {
+          const hashText = Buffer.from(
+            httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
+          authzHeaderOptions.signature = await crypto.sign(
+            null, hashText, keyObj).toString('base64');
+        }
         requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
           authzHeaderOptions);
         return requestOptions.headers;
