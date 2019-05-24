@@ -38,18 +38,6 @@ async function getStdin(encoding = 'utf8') {
   });
 }
 
-/**
- * Gets a file then converts it to json.
- *
- * @param {string} file - File path.
- *
- * @returns {Object} The json object.
- */
-async function getJSON(file) {
-  const keyData = await readFile(file);
-  return JSON.parse(keyData);
-}
-
 async function getHTTPMessage() {
   const HTTPMessage = await getStdin();
   if(!HTTPMessage) {
@@ -82,7 +70,7 @@ function getHTTPSignatureAlgorithm(algorithm) {
     case 'hs2019': {
       return {
         hash: crypto.createHash('SHA512'),
-        dsa: ['rsa', 'hmac', 'ed', 'ecdsa']
+        dsa: ['rsa', 'hmac', 'ed', 'ecdsa', 'p']
       };
     }
     default: {
@@ -173,13 +161,9 @@ const createHttpSignatureRequest = async (
 };
 
 exports.canonicalize = async function(program) {
-  const {headers} = program;
+  const {headers = ''} = program;
   const requestOptions = await getHTTPMessage();
-  if(!headers) {throw new Error(
-    '--headers required for command c14n|canonicalize' +
-    'ex: --header date,etag');}
-  const includeHeaders =
-    program.headers ? program.headers.split(/\s+/) : '';
+  const includeHeaders = headers.split(/\s+/);
   const result = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
   console.log(result);
