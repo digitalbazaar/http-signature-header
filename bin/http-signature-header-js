@@ -41,7 +41,8 @@ program
   .command('verify')
   .action(async () => {
     try {
-      verify(program);
+      const result = await verify(program);
+      process.stdout.write(result);
       process.exit(0);
     } catch(e) {
       console.error('Verification Error:', e);
