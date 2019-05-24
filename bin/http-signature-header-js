@@ -14,7 +14,8 @@ program
   .alias('canonicalize')
   .action(async () => {
     try {
-      await canonicalize(program);
+      const result = await canonicalize(program);
+      process.stdout.write(result);
       process.exit(0);
     } catch(e) {
       console.error('c14n command failed : ' + e);
@@ -26,7 +27,8 @@ program
   .command('sign')
   .action(async () => {
     try {
-      await sign(program);
+      const result = await sign(program);
+      process.stdout.write(result);
       process.exit(0);
     } catch(e) {
       console.error('Sign Error', e);

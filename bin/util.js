@@ -166,7 +166,7 @@ exports.canonicalize = async function(program) {
   const includeHeaders = headers.split(/\s+/);
   const result = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
-  console.log(result);
+  return result;
 };
 
 exports.sign = async function(program) {
@@ -193,7 +193,7 @@ exports.sign = async function(program) {
   };
   const result = await createHttpSignatureRequest(options);
   const message = makeHTTPHeaders(result);
-  console.log(message);
+  return message;
 };
 
 exports.verify = async function(program) {
