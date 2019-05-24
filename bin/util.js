@@ -197,17 +197,12 @@ exports.sign = async function(program) {
 };
 
 exports.verify = async function(program) {
-  try {
-    const reqJson = await getHTTPMessage();
-    const {
-      headers, keyId, privateKey, publicKey,
-      keyType, algorithm, created, expires
-    } = program;
-    const publicKeyFile = await readFile(publicKey);
-    // TODO: abstract middleware verify in this.
-    // TODO: get options from program env variables.
-    throw new Error('Command verify has not been implemented yet.');
-    process.exit(0);
-  } catch(e) {
-  }
+  const reqJson = await getHTTPMessage();
+  const {
+    headers, keyId, privateKey, publicKey,
+    keyType, algorithm, created, expires
+  } = program;
+  const publicKeyFile = await readFile(publicKey);
+  // TODO: abstract middleware verify in this.
+  // TODO: get options from program env variables.
 };
