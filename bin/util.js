@@ -166,12 +166,14 @@ const createHttpSignatureRequest = async (
 };
 
 exports.canonicalize = async function(program) {
-  const {headers} = program;
+  const {headers, created, expires} = program;
   if(headers === true) {
     return '';
   }
   const requestOptions = await getHTTPMessage();
-  const includeHeaders = headers;
+  requestOptions.headers['(created)'] = created;
+  requestOptions.headers['(expires)'] = expires;
+  const includeHeaders = headers.length > 0 ? headers : ['(created)'];
   const result = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
   return result;
