@@ -167,11 +167,11 @@ const createHttpSignatureRequest = async (
 
 exports.canonicalize = async function(program) {
   const {headers} = program;
-  if(headers === '') {
+  if(headers === true) {
     return '';
   }
   const requestOptions = await getHTTPMessage();
-  const includeHeaders = headers.split(/\s+/);
+  const includeHeaders = headers;
   const result = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
   return result;
@@ -190,7 +190,7 @@ exports.sign = async function(program) {
     throw new Error('A private key is required for signing');
   }
   const privateKeyFile = await readFile(privateKey);
-  const includeHeaders = headers ? program.headers.split(/\s+/) : '';
+  const includeHeaders = headers;
   const requestOptions = await getHTTPMessage();
   const options = {
     keyType,
@@ -219,7 +219,7 @@ exports.verify = async function(program) {
     algorithm = 'hs2019'
   } = program;
   validate(program);
-  const includeHeaders = headers.split(/\s+/);
+  const includeHeaders = headers;
   let canonicalizedString = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
   const publicKeyFile = await readFile(publicKey);
