@@ -166,7 +166,10 @@ const createHttpSignatureRequest = async (
 };
 
 exports.canonicalize = async function(program) {
-  const {headers = ''} = program;
+  const {headers} = program;
+  if(headers === '') {
+    return '';
+  }
   const requestOptions = await getHTTPMessage();
   const includeHeaders = headers.split(/\s+/);
   const result = httpSigs.
