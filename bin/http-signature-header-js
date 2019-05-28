@@ -50,11 +50,17 @@ program
     }
   });
 
+function parseHeaders(val) {
+  if(!val) {
+    return '';
+  }
+  return val.split(/\s+/);
+}
 // all of the common options are accessed
 // from program.name i.e. program.headers etc
 program
   .version('0.0.1')
-  .option('-d, --headers <headers>', 'A list of header names.')
+  .option('-d, --headers [headers]', 'A list of header names.', parseHeaders)
   .option('-k, --keyId <keyId>', 'A Key Id string.')
   .option('-p, --private-key <privateKey>.',
     'A private key file name filename.')
