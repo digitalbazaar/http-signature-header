@@ -63,7 +63,7 @@ function makeHTTPHeaders(headers = {}) {
 
 const hs2019 = {
   hash: crypto.createHash('SHA512'),
-  dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ecdsa/i, /^p256/i],
+  dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ec/i, /^p256/i],
   validKey(key) {
     return hs2019.dsa
       .reduce((any, current) => {
@@ -142,16 +142,17 @@ const createHttpSignatureRequest = async (
     {includeHeaders, requestOptions});
   httpSignatureAlgorithm.hash.update(plaintext);
   const authzHeaderOptions = {includeHeaders, keyId: 'test-key'};
-  // TODO add signing support for HMAC, P-256,
-  // Ed25519ph, Ed25519ctx,
-  // ANSI X9.62-2005
-  const keyTypes = keyType.trim().toLowerCase();
+  const keyObj = crypto.createPrivateKey(privateKey);
+  const keyTypes = keyObj.asymmetricKeyType || keyType.trim().toLowerCase();
+  if(!['secret', 'private'].includes(keyObj.type)) {
+    throw new Error(
+      `Expected the key to be private or secret recieved ${keyObj.type}`);
+  }
   const valid = httpSignatureAlgorithm.validKey(keyTypes);
   if(!valid) {
-    throw new Error(`Unsupported signing algorithm ${keyType}`);
+    throw new Error(`Unsupported signing algorithm ${keyTypes}`);
   }
-  const keyObj = crypto.createPrivateKey(privateKey);
-  if(keyType === 'hmac') {
+  if(keyTypes === 'hmac') {
     authzHeaderOptions.signature = crypto.createHmac('SHA512', privateKey)
       .update(plaintext).digest('base64');
   } else {
@@ -225,10 +226,12 @@ exports.verify = async function(program) {
   let canonicalizedString = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
   const publicKeyFile = await readFile(publicKey);
+  const dereferencedPublicKey = crypto.createPublicKey(publicKeyFile);
   const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
-  const valid = httpSignatureAlgorithm.validKey(keyType);
+  const kType = dereferencedPublicKey.asymmetricKeyType || keyType;
+  const valid = httpSignatureAlgorithm.validKey(kType);
   if(!valid) {
-    throw new Error(`Unsupported signing algorithm ${keyType}`);
+    throw new Error(`Unsupported signing algorithm ${kType}`);
   }
   const options = {
     authorizationHeaderName: 'Authorization',
