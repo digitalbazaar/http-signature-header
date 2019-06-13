@@ -4,7 +4,7 @@
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
 */
 
-// this module is the binary used by the http signature spec test stuies
+// this module is the binary used by the http signature spec test suites
 // @see https://github.com/w3c-dvcg/http-signatures-test-suite
 const program = require('commander');
 const {canonicalize, sign, verify} = require('./util');
