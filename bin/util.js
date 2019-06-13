@@ -143,7 +143,7 @@ const createHttpSignatureRequest = async (
   httpSignatureAlgorithm.hash.update(plaintext);
   const authzHeaderOptions = {includeHeaders, keyId: 'test-key'};
   const keyObj = crypto.createPrivateKey(privateKey);
-  const keyTypes = keyObj.asymmetricKeyType || keyType.trim().toLowerCase();
+  const keyTypes = keyType.trim().toLowerCase() || keyObj.asymmetricKeyType;
   if(!['secret', 'private'].includes(keyObj.type)) {
     throw new Error(
       `Expected the key to be private or secret recieved ${keyObj.type}`);
@@ -228,7 +228,7 @@ exports.verify = async function(program) {
   const publicKeyFile = await readFile(publicKey);
   const dereferencedPublicKey = crypto.createPublicKey(publicKeyFile);
   const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
-  const kType = dereferencedPublicKey.asymmetricKeyType || keyType;
+  const kType = keyType || dereferencedPublicKey.asymmetricKeyType;
   const valid = httpSignatureAlgorithm.validKey(kType);
   if(!valid) {
     throw new Error(`Unsupported signing algorithm ${kType}`);
