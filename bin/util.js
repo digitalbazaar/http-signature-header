@@ -5,8 +5,13 @@ const util = require('util');
 const httpMessageParser = require('http-message-parser');
 const jsprim = require('jsprim');
 
-// this can be use to await paths to private keys and other files.
-// also can get be used to dereference keyId in middleware
+/**
+ * This opens a file from disk asynchronously.
+ *
+ * @param {string} path - A file path.
+ *
+ * @returns {string|Buffer} The result of opening the file.
+ */
 const readFile = util.promisify(fs.readFile);
 
 /**
