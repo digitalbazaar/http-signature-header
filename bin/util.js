@@ -64,6 +64,23 @@ function validate(options) {
 }
 
 /**
+ * Simple validator on private key that ensure
+ * the key is either secret for hmac or private.
+ *
+ * @param {Object} keyObj - A node Private Key Object.
+ *
+ * @throws If the key is neither secret or private.
+ *
+ * @returns {undefined}
+ */
+function validatePrivateKey(keyObj) {
+  if(!['secret', 'private'].includes(keyObj.type)) {
+    throw new Error(
+      `Expected the key to be private or secret recieved ${keyObj.type}`);
+  }
+}
+
+/**
  * Add HTTPSignatures headers to a given requestOptions object.
  * This is compatible with both request and axios libraries.
  * TODO: factor out to new npm package.
@@ -96,11 +113,8 @@ const createHttpSignatureRequest = async (
   httpSignatureAlgorithm.hash.update(plaintext);
   const authzHeaderOptions = {includeHeaders, keyId: 'test-key'};
   const keyObj = crypto.createPrivateKey(privateKey);
+  validatePrivateKey(keyObj);
   const keyTypes = keyType.trim().toLowerCase() || keyObj.asymmetricKeyType;
-  if(!['secret', 'private'].includes(keyObj.type)) {
-    throw new Error(
-      `Expected the key to be private or secret recieved ${keyObj.type}`);
-  }
   const valid = httpSignatureAlgorithm.validKey(keyTypes);
   if(!valid) {
     throw new Error(`Unsupported signing algorithm ${keyTypes}`);
