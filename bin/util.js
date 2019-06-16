@@ -1,58 +1,6 @@
 const crypto = require('crypto');
 const httpSigs = require('../lib/');
-const fs = require('fs');
-const util = require('util');
-const httpMessageParser = require('http-message-parser');
 const jsprim = require('jsprim');
-
-/**
- * This opens a file from disk asynchronously.
- *
- * @param {string} path - A file path.
- *
- * @returns {string|Buffer} The result of opening the file.
- */
-const readFile = util.promisify(fs.readFile);
-
-/**
- * Simple wrapper around node's process.stdin.
- * This allows us to get the result of cat and other commands.
- *
- * @param {string} [encoding='utf8'] - The http message's encoding.
- *
- * @returns {Promise<string>} Should return the http message.
- */
-async function getStdin(encoding = 'utf8') {
-  const {stdin} = process;
-  let message = '';
-  return new Promise((resolve, reject) => {
-    try {
-      stdin.setEncoding(encoding);
-      stdin.on('readable', () => {
-        let chunk;
-        while((chunk = stdin.read())) {
-          message += chunk;
-        }
-      });
-      stdin.on('end', () => resolve(message));
-      stdin.on('error', reject);
-    }
-    catch(e) {
-      reject(e);
-    }
-  });
-}
-
-async function getHTTPMessage() {
-  const HTTPMessage = await getStdin();
-  if(!HTTPMessage) {
-    throw new Error(
-      'An HTTP Message must be passed to stdin for this command.');
-  }
-  // this will create a request or response object
-  // similar to node's default request object.
-  return httpMessageParser(HTTPMessage);
-}
 
 function makeHTTPHeaders(headers = {}) {
   let message = '';
@@ -171,12 +119,11 @@ const createHttpSignatureRequest = async (
   return requestOptions.headers;
 };
 
-exports.canonicalize = async function(program) {
+exports.canonicalize = async function(program, requestOptions) {
   const {headers, created, expires} = program;
   if(headers === true) {
     return '';
   }
-  const requestOptions = await getHTTPMessage();
   requestOptions.headers['(created)'] = created;
   requestOptions.headers['(expires)'] = expires;
   const includeHeaders = headers.length > 0 ? headers : ['(created)'];
@@ -185,7 +132,7 @@ exports.canonicalize = async function(program) {
   return result;
 };
 
-exports.sign = async function(program) {
+exports.sign = async function(program, requestOptions, privateKeyFile) {
   const {
     headers, keyType, privateKey,
     algorithm
@@ -197,9 +144,7 @@ exports.sign = async function(program) {
   if(!privateKey) {
     throw new Error('A private key is required for signing');
   }
-  const privateKeyFile = await readFile(privateKey);
   const includeHeaders = headers;
-  const requestOptions = await getHTTPMessage();
   const options = {
     keyType,
     algorithm,
@@ -212,7 +157,7 @@ exports.sign = async function(program) {
   return message;
 };
 
-exports.verify = async function(program) {
+exports.verify = async function(program, requestOptions, publicKeyFile) {
   /**
  * 1. recreate the canonzied string (not hashed, not signed, not base 64)
  * 1a. might need to hash canonized
@@ -221,16 +166,14 @@ exports.verify = async function(program) {
  * 4. decode the actual `signature` paramter to bytes (not base 64)
  * 5. pass publicKey, canonziedString, and decoded signature bytes to verify
  */
-  const requestOptions = await getHTTPMessage();
   const {
-    headers = '', keyType, publicKey,
+    headers = '', keyType,
     algorithm = 'hs2019'
   } = program;
   validate(program);
   const includeHeaders = headers;
   let canonicalizedString = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
-  const publicKeyFile = await readFile(publicKey);
   const dereferencedPublicKey = crypto.createPublicKey(publicKeyFile);
   const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
   const kType = keyType || dereferencedPublicKey.asymmetricKeyType;
