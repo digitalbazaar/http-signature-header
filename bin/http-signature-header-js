@@ -8,13 +8,15 @@
 // @see https://github.com/w3c-dvcg/http-signatures-test-suite
 const program = require('commander');
 const {canonicalize, sign, verify} = require('./util');
+const {getHTTPMessage, readFile} = require('./io');
 
 program
   .command('c14n')
   .alias('canonicalize')
   .action(async () => {
     try {
-      const result = await canonicalize(program);
+      const message = await getHTTPMessage();
+      const result = await canonicalize(program, message);
       process.stdout.write(result);
       process.exit(0);
     } catch(e) {
@@ -27,7 +29,9 @@ program
   .command('sign')
   .action(async () => {
     try {
-      const result = await sign(program);
+      const message = await getHTTPMessage();
+      const privateKeyFile = await readFile(program.privateKey);
+      const result = await sign(program, message, privateKeyFile);
       process.stdout.write(result);
       process.exit(0);
     } catch(e) {
@@ -41,7 +45,9 @@ program
   .command('verify')
   .action(async () => {
     try {
-      const result = await verify(program);
+      const message = await getHTTPMessage();
+      const publicKeyFile = await readFile(program.publicKey);
+      const result = await verify(program, message, publicKeyFile);
       process.stdout.write(result);
       process.exit(0);
     } catch(e) {
