@@ -96,9 +96,9 @@ function validatePrivateKey(keyObj) {
  *
  * @returns {Object} The response headers.
 */
-const createHttpSignatureRequest = async (
+async function createHttpSignatureRequest(
   {algorithm = 'hs2019', privateKey, keyType,
-    requestOptions, includeHeaders = []}) => {
+    requestOptions, includeHeaders = []}) {
   // get metadata from public key
   if(!keyType) {
     throw new Error('Expected to recieve keyType');
