@@ -95,9 +95,26 @@ describe('http-signature', () => {
         url: 'https://example.com:18443/1/2/3',
       };
       const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['host', '(created)', '(request-target)'], requestOptions});
+        {includeHeaders:
+          ['host', '(created)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\n(created): ${date}\n(request-target): get /1/2/3`);
+        `host: example.com:18443\n(created): ${date}\n` +
+        `(request-target): get /1/2/3`);
+      done();
+    });
+    it('properly encodes `(expires)` with a timestamp', done => {
+      const date = Date.now() + 1000;
+      const requestOptions = {
+        headers: {['(expires)']: date},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders:
+          ['host', '(expires)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(expires): ${date}\n` +
+        `(request-target): get /1/2/3`);
       done();
     });
 
