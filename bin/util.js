@@ -69,7 +69,7 @@ function validate(options) {
  *
  * @param {Object} keyObj - A node Private Key Object.
  *
- * @throws If the key is neither secret or private.
+ * @throws If the key is neither secret nor private.
  *
  * @returns {undefined}
  */
