@@ -119,6 +119,22 @@ describe('http-signature', () => {
         `(request-target): get /1/2/3`);
       done();
     });
+    it('properly encodes `(key-id)` with an iri', done => {
+      const iri = 'https://example.com/key.pub';
+      const requestOptions = {
+        headers: {},
+        'key-id': iri,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders:
+          ['host', '(key-id)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\nkey-id: ${iri}\n` +
+        `(request-target): get /1/2/3`);
+      done();
+    });
 
     it('properly encodes a header with multiple values', done => {
       const date = new Date().toUTCString();
