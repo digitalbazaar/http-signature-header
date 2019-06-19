@@ -87,6 +87,20 @@ describe('http-signature', () => {
         `host: example.com:18443\ndate: ${date}\n(request-target): get /1/2/3`);
       done();
     });
+    it('properly encodes `(created)` with a timestamp', done => {
+      const date = Date.now();
+      const requestOptions = {
+        headers: {['(created)']: date},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['host', '(created)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(created): ${date}\n(request-target): get /1/2/3`);
+      done();
+    });
+
     it('properly encodes a header with multiple values', done => {
       const date = new Date().toUTCString();
       const requestOptions = {
