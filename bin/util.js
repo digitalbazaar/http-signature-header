@@ -1,6 +1,28 @@
 const crypto = require('crypto');
 const httpSigs = require('../lib/');
 const jsprim = require('jsprim');
+const forge = require('node-forge');
+
+// removes PEM headings etc.
+const keyStripper = /\-{5}(?<text>[A-z\s]+)\-{5}/gi;
+/**
+ * Takes in a possibly PEM encoded key
+ * and returns just the Der formatted value.
+ *
+ * @param {string} key - A possibly PEM encoded key.
+ *
+ * @returns {string} Just the Der value.
+ */
+function removePEMFormat(key) {
+  return key
+    .replace(keyStripper, '')
+    .replace(/\n/g, '');
+}
+exports.removePEMFormat = removePEMFormat;
+
+//TODO figure out how to get get the oid
+//the way this library does:
+//https://github.com/mawi12345/sASN1/blob/master/asn1.js
 
 function makeHTTPHeaders(headers = {}) {
   let message = '';
@@ -15,7 +37,7 @@ function makeHTTPHeaders(headers = {}) {
 }
 
 const hs2019 = {
-  hash: crypto.createHash('SHA512'),
+  hash: forge.md.sha512.create(),
   dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ec/i, /^p256/i],
   validKey(key) {
     return hs2019.dsa
