@@ -133,7 +133,7 @@ async function createHttpSignatureRequest(
   return requestOptions.headers;
 }
 
-exports.canonicalize = async function(program, requestOptions) {
+exports.canonicalize = async function({program, message: requestOptions}) {
   const {headers, created, expires} = program;
   if(headers === true) {
     return '';
@@ -146,7 +146,8 @@ exports.canonicalize = async function(program, requestOptions) {
   return result;
 };
 
-exports.sign = async function(program, requestOptions, privateKeyFile) {
+exports.sign = async function(
+  {program, message: requestOptions, privateKeyFile}) {
   const {
     headers, keyType, privateKey,
     algorithm
@@ -171,7 +172,8 @@ exports.sign = async function(program, requestOptions, privateKeyFile) {
   return message;
 };
 
-exports.verify = async function(program, requestOptions, publicKeyFile) {
+exports.verify = async function(
+  {program, message: requestOptions, publicKeyFile}) {
   /**
  * 1. recreate the canonzied string (not hashed, not signed, not base 64)
  * 1a. might need to hash canonized
