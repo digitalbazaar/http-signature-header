@@ -76,7 +76,8 @@ function validate(options) {
 function validatePrivateKey(keyObj) {
   if(!['secret', 'private'].includes(keyObj.type)) {
     throw new Error(
-      `Invalid key type "${keyObj.type}". Key type must be "secret" or "private".`);
+      `Invalid key type "${keyObj.type}".` +
+      ' Key type must be "secret" or "private".');
   }
 }
 
@@ -96,9 +97,10 @@ function validatePrivateKey(keyObj) {
  *
  * @returns {Object} The response headers.
 */
-async function createHttpSignatureRequest(
-  {algorithm = 'hs2019', privateKey, keyType,
-    requestOptions, includeHeaders = []}) {
+async function createHttpSignatureRequest({
+  algorithm = 'hs2019', privateKey, keyType,
+  requestOptions, includeHeaders = []
+}) {
   // get metadata from public key
   if(!keyType) {
     throw new Error('Expected to recieve keyType');
