@@ -1,4 +1,8 @@
-// this module just contains stuff used for io
+/**
+ * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
+*/
+'use strict';
+
 const fs = require('fs');
 const util = require('util');
 const httpMessageParser = require('http-message-parser');
