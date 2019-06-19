@@ -76,7 +76,7 @@ function validate(options) {
 function validatePrivateKey(keyObj) {
   if(!['secret', 'private'].includes(keyObj.type)) {
     throw new Error(
-      `Expected the key to be private or secret recieved ${keyObj.type}`);
+      `Invalid key type "${keyObj.type}". Key type must be "secret" or "private".`);
   }
 }
 
