@@ -90,7 +90,8 @@ describe('http-signature', () => {
     it('properly encodes `(created)` with a timestamp', done => {
       const date = Date.now();
       const requestOptions = {
-        headers: {['(created)']: date},
+        headers: {},
+        created: date,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -98,14 +99,15 @@ describe('http-signature', () => {
         {includeHeaders:
           ['host', '(created)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\n(created): ${date}\n` +
+        `host: example.com:18443\ncreated: ${date}\n` +
         `(request-target): get /1/2/3`);
       done();
     });
     it('properly encodes `(expires)` with a timestamp', done => {
       const date = Date.now() + 1000;
       const requestOptions = {
-        headers: {['(expires)']: date},
+        headers: {},
+        expires: date,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -113,7 +115,7 @@ describe('http-signature', () => {
         {includeHeaders:
           ['host', '(expires)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\n(expires): ${date}\n` +
+        `host: example.com:18443\nexpires: ${date}\n` +
         `(request-target): get /1/2/3`);
       done();
     });
