@@ -187,7 +187,7 @@ describe('http-signature', () => {
       };
       expect(() => httpSignatureHeader.createSignatureString(
         {includeHeaders: ['(bad)'], requestOptions}))
-        .to.throw(HttpSignatureError, /Illegal header [A-z\(\)]+/i);
+        .to.throw(HttpSignatureError, /Illegal header "[A-z\(\)]+"/i);
       done();
     });
   });

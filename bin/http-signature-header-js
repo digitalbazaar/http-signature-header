@@ -3,6 +3,7 @@
 /**
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
 */
+'use strict';
 
 // this module is the binary used by the http signature spec test suites
 // @see https://github.com/w3c-dvcg/http-signatures-test-suite
@@ -16,7 +17,7 @@ program
   .action(async () => {
     try {
       const message = await getHTTPMessage();
-      const result = await canonicalize(program, message);
+      const result = await canonicalize({program, message});
       process.stdout.write(result);
       process.exit(0);
     } catch(e) {
@@ -31,7 +32,7 @@ program
     try {
       const message = await getHTTPMessage();
       const privateKeyFile = await readFile(program.privateKey);
-      const result = await sign(program, message, privateKeyFile);
+      const result = await sign({program, message, privateKeyFile});
       process.stdout.write(result);
       process.exit(0);
     } catch(e) {
@@ -47,7 +48,7 @@ program
     try {
       const message = await getHTTPMessage();
       const publicKeyFile = await readFile(program.publicKey);
-      const result = await verify(program, message, publicKeyFile);
+      const result = await verify({program, message, publicKeyFile});
       process.stdout.write(result);
       process.exit(0);
     } catch(e) {
