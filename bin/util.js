@@ -64,7 +64,7 @@ function validate(options) {
 }
 
 /**
- * Simple validator on private key that ensure
+ * Simple validator for a private key that ensures
  * the key is either secret for hmac or private.
  *
  * @param {Object} keyObj - A node Private Key Object.
