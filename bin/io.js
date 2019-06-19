@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
-*/
+ */
 'use strict';
 
 const fs = require('fs');
@@ -14,8 +14,7 @@ const httpMessageParser = require('http-message-parser');
  *
  * @returns {string|Buffer} The result of opening the file.
  */
-const readFile = util.promisify(fs.readFile);
-exports.readFile = readFile;
+exports.readFile = util.promisify(fs.readFile);
 
 /**
  * Simple wrapper around node's process.stdin.
