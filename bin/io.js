@@ -39,7 +39,6 @@ async function getStdin(encoding = 'utf8') {
       });
       stdin.on('end', () => resolve(message));
       stdin.on('error', reject);
-    }
     } catch(e) {
       reject(e);
     }
