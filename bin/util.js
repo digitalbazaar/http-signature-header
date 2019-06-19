@@ -131,7 +131,7 @@ async function createHttpSignatureRequest(
   requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
     authzHeaderOptions);
   return requestOptions.headers;
-};
+}
 
 exports.canonicalize = async function(program, requestOptions) {
   const {headers, created, expires} = program;
