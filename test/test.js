@@ -123,7 +123,7 @@ describe('http-signature', () => {
       const iri = 'https://example.com/key.pub';
       const requestOptions = {
         headers: {},
-        'key-id': iri,
+        keyId: iri,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
