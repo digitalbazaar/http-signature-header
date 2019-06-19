@@ -99,7 +99,7 @@ describe('http-signature', () => {
         {includeHeaders:
           ['host', '(created)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\ncreated: ${date}\n` +
+        `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
       done();
     });
@@ -115,7 +115,7 @@ describe('http-signature', () => {
         {includeHeaders:
           ['host', '(expires)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\nexpires: ${date}\n` +
+        `host: example.com:18443\n(expires): ${date}\n` +
         `(request-target): get /1/2/3`);
       done();
     });
@@ -131,7 +131,7 @@ describe('http-signature', () => {
         {includeHeaders:
           ['host', '(key-id)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\nkey-id: ${iri}\n` +
+        `host: example.com:18443\n(key-id): ${iri}\n` +
         `(request-target): get /1/2/3`);
       done();
     });
@@ -147,7 +147,7 @@ describe('http-signature', () => {
         {includeHeaders:
           ['host', '(algorithm)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\nalgorithm: ${algorithm}\n` +
+        `host: example.com:18443\n(algorithm): ${algorithm}\n` +
         `(request-target): get /1/2/3`);
       done();
     });
@@ -177,6 +177,17 @@ describe('http-signature', () => {
       expect(() => httpSignatureHeader.createSignatureString(
         {includeHeaders: ['foo', 'date'], requestOptions}))
         .to.throw(HttpSignatureError, /foo was not found/);
+      done();
+    });
+    it('throws when an invalid header is specified', done => {
+      const requestOptions = {
+        headers: {'(bad)': true},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      expect(() => httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['(bad)'], requestOptions}))
+        .to.throw(HttpSignatureError, /Illegal header [A-z\(\)]+/i);
       done();
     });
   });
