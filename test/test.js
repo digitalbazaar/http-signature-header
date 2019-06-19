@@ -13,7 +13,7 @@ const HttpSignatureError = require('../lib/HttpSignatureError');
 describe('http-signature', () => {
 
   describe('createSignatureString API', () => {
-    it('uses `date` header if specified', done => {
+    it('uses `date` header if specified', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
@@ -23,9 +23,8 @@ describe('http-signature', () => {
       const stringToSign = httpSignatureHeader.createSignatureString(
         {includeHeaders: ['date'], requestOptions});
       stringToSign.should.equal(`date: ${date}`);
-      done();
     });
-    it('properly encodes `(request-target)` with root path', done => {
+    it('properly encodes `(request-target)` with root path', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
@@ -35,9 +34,8 @@ describe('http-signature', () => {
       const stringToSign = httpSignatureHeader.createSignatureString(
         {includeHeaders: ['date', '(request-target)'], requestOptions});
       stringToSign.should.equal(`date: ${date}\n(request-target): get /`);
-      done();
     });
-    it('properly encodes `(request-target)` with a path', done => {
+    it('properly encodes `(request-target)` with a path', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
@@ -47,9 +45,8 @@ describe('http-signature', () => {
       const stringToSign = httpSignatureHeader.createSignatureString(
         {includeHeaders: ['date', '(request-target)'], requestOptions});
       stringToSign.should.equal(`date: ${date}\n(request-target): get /1/2/3`);
-      done();
     });
-    it('properly encodes `(request-target)` with post method', done => {
+    it('properly encodes `(request-target)` with post method', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
@@ -59,9 +56,8 @@ describe('http-signature', () => {
       const stringToSign = httpSignatureHeader.createSignatureString(
         {includeHeaders: ['date', '(request-target)'], requestOptions});
       stringToSign.should.equal(`date: ${date}\n(request-target): post /`);
-      done();
     });
-    it('properly encodes `host`', done => {
+    it('properly encodes `host`', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
@@ -72,9 +68,8 @@ describe('http-signature', () => {
         {includeHeaders: ['host', 'date', '(request-target)'], requestOptions});
       stringToSign.should.equal(
         `host: example.com\ndate: ${date}\n(request-target): get /1/2/3`);
-      done();
     });
-    it('properly encodes `host` with a port', done => {
+    it('properly encodes `host` with a port', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
@@ -85,9 +80,8 @@ describe('http-signature', () => {
         {includeHeaders: ['host', 'date', '(request-target)'], requestOptions});
       stringToSign.should.equal(
         `host: example.com:18443\ndate: ${date}\n(request-target): get /1/2/3`);
-      done();
     });
-    it('properly encodes `(created)` with a timestamp', done => {
+    it('properly encodes `(created)` with a timestamp', () => {
       const date = Date.now();
       const requestOptions = {
         headers: {},
@@ -101,9 +95,8 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
-      done();
     });
-    it('properly encodes `(expires)` with a timestamp', done => {
+    it('properly encodes `(expires)` with a timestamp', () => {
       const date = Date.now() + 1000;
       const requestOptions = {
         headers: {},
@@ -117,9 +110,8 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `host: example.com:18443\n(expires): ${date}\n` +
         `(request-target): get /1/2/3`);
-      done();
     });
-    it('properly encodes `(key-id)` with an iri', done => {
+    it('properly encodes `(key-id)` with an iri', () => {
       const iri = 'https://example.com/key.pub';
       const requestOptions = {
         headers: {},
@@ -133,9 +125,8 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `host: example.com:18443\n(key-id): ${iri}\n` +
         `(request-target): get /1/2/3`);
-      done();
     });
-    it('properly encodes `(algorithm)` with a string', done => {
+    it('properly encodes `(algorithm)` with a string', () => {
       const algorithm = 'hs2019';
       const requestOptions = {
         headers: {},
@@ -149,10 +140,9 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `host: example.com:18443\n(algorithm): ${algorithm}\n` +
         `(request-target): get /1/2/3`);
-      done();
     });
 
-    it('properly encodes a header with multiple values', done => {
+    it('properly encodes a header with multiple values', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date, 'x-custom': ['val1', 'val2']},
@@ -165,9 +155,8 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `x-custom: val1, val2\nhost: example.com\ndate: ` +
         `${date}\n(request-target): get /1/2/3`);
-      done();
     });
-    it('throws when an unknown header is specified', done => {
+    it('throws when an unknown header is specified', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
         headers: {date},
@@ -177,9 +166,8 @@ describe('http-signature', () => {
       expect(() => httpSignatureHeader.createSignatureString(
         {includeHeaders: ['foo', 'date'], requestOptions}))
         .to.throw(HttpSignatureError, /foo was not found/);
-      done();
     });
-    it('throws when an invalid header is specified', done => {
+    it('throws when an invalid header is specified', () => {
       const requestOptions = {
         headers: {'(bad)': true},
         method: 'GET',
@@ -188,7 +176,6 @@ describe('http-signature', () => {
       expect(() => httpSignatureHeader.createSignatureString(
         {includeHeaders: ['(bad)'], requestOptions}))
         .to.throw(HttpSignatureError, /Illegal header "[A-z\(\)]+"/i);
-      done();
     });
   });
 

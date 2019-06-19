@@ -175,17 +175,14 @@ exports.sign = async function(
 exports.verify = async function(
   {program, message: requestOptions, publicKeyFile}) {
   /**
- * 1. recreate the canonzied string (not hashed, not signed, not base 64)
- * 1a. might need to hash canonized
- * 2. get the public key from key id
- * 3. if there is an algorithm check key is in types
- * 4. decode the actual `signature` paramter to bytes (not base 64)
- * 5. pass publicKey, canonziedString, and decoded signature bytes to verify
- */
-  const {
-    headers = '', keyType,
-    algorithm = 'hs2019'
-  } = program;
+    * 1. recreate the canonzied string (not hashed, not signed, not base 64)
+    * 1a. might need to hash canonized
+    * 2. get the public key from key id
+    * 3. if there is an algorithm check key is in types
+    * 4. decode the actual `signature` paramter to bytes (not base 64)
+    * 5. pass publicKey, canonziedString, and decoded signature bytes to verify
+   */
+  const {headers = '', keyType, algorithm = 'hs2019'} = program;
   validate(program);
   const includeHeaders = headers;
   let canonicalizedString = httpSigs.
