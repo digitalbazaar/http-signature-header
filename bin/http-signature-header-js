@@ -10,13 +10,15 @@
 const program = require('commander');
 const {canonicalize, sign, verify} = require('./util');
 const {getHTTPMessage, readFile} = require('./io');
+const {extractPseudoHeaders} = require('../lib');
 
 program
   .command('c14n')
   .alias('canonicalize')
   .action(async () => {
     try {
-      const message = await getHTTPMessage();
+      const _message = await getHTTPMessage();
+      const message = extractPseudoHeaders(program, _message);
       const result = await canonicalize({program, message});
       process.stdout.write(result);
       process.exit(0);
