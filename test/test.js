@@ -96,6 +96,22 @@ describe('http-signature', () => {
         `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
     });
+    it('convert Date objects to unix timestamps', () => {
+      const date = new Date();
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders:
+          ['host', '(created)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(created): ${date.getTime()}\n` +
+        `(request-target): get /1/2/3`);
+    });
+
     it('properly encodes `(expires)` with a timestamp', () => {
       const date = Date.now() + 1000;
       const requestOptions = {

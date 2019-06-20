@@ -142,7 +142,8 @@ exports.canonicalize = async function({program, message: requestOptions}) {
   }
   requestOptions.headers['(created)'] = created;
   requestOptions.headers['(expires)'] = expires;
-  const includeHeaders = headers.length > 0 ? headers : ['(created)'];
+  const noHeaders = !headers || headers.length === 0;
+  const includeHeaders = noHeaders ? ['(created)'] : headers;
   const result = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
   return result;
