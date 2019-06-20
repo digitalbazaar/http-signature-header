@@ -96,7 +96,7 @@ describe('http-signature', () => {
         `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
     });
-    it('encode Date objects for `(created)` to timestamp', () => {
+    it('convert Date objects to unix timestamps', () => {
       const date = new Date();
       const requestOptions = {
         headers: {},
