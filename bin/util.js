@@ -3,22 +3,21 @@ const httpSigs = require('../lib/');
 const jsprim = require('jsprim');
 const forge = require('node-forge');
 
-// removes PEM headings etc.
-const keyStripper = /\-{5}(?<text>[A-z\s]+)\-{5}/gi;
 /**
- * Takes in a possibly PEM encoded key
- * and returns just the Der formatted value.
+ * Takes a pem encoded key return an oid.
  *
- * @param {string} key - A possibly PEM encoded key.
+ * @param {string|Buffer} pemKey - A pem public key.
  *
- * @returns {string} Just the Der value.
+ * @returns {string} The oid.
  */
-function removePEMFormat(key) {
-  return key
-    .replace(keyStripper, '')
-    .replace(/\n/g, '');
+function getOID(pemKey) {
+  const [publicKey] = forge.pem.decode(pemKey);
+  const asn1 = forge.asn1.fromDer(publicKey.body);
+  const {oid} = forge.asn1.getOid(asn1);
+  console.log('oid', oid);
+  return oid;
 }
-exports.removePEMFormat = removePEMFormat;
+exports.getOID = getOID;
 
 //TODO figure out how to get get the oid
 //the way this library does:

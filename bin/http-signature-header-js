@@ -8,7 +8,7 @@
 // this module is the binary used by the http signature spec test suites
 // @see https://github.com/w3c-dvcg/http-signatures-test-suite
 const program = require('commander');
-const {canonicalize, sign, verify} = require('./util');
+const {canonicalize, sign, verify, getOID} = require('./util');
 const {getHTTPMessage, readFile} = require('./io');
 const {extractPseudoHeaders} = require('../lib');
 
@@ -57,6 +57,13 @@ program
       console.error('Verification Error:', e);
       process.exit(1);
     }
+  });
+
+program
+  .command('test')
+  .action(async () => {
+    const publicKeyFile = await readFile(program.publicKey);
+    getOID(publicKeyFile);
   });
 
 function parseHeaders(val) {

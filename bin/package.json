@@ -21,7 +21,7 @@
     "signature-algorithms": "^1.0.0"
   },
   "dependencies": {
-    "node-forge": "^0.8.4",
+    "node-forge": "file:../../forge/",
     "sasn1": "^0.1.1"
   }
 }
