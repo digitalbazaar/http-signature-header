@@ -1,5 +1,13 @@
 # http-signature-header
 
+## 1.3.0 - 2019-06-29
+
+### Added
+- Include `created` and `expires` in authz header.
+- Accept Date objects for parameters and header values.
+- Support `hs2019`.
+- Support `(key-id)` and `(algorithm)` pseudo headers.
+
 ## 1.2.0 - 2019-03-02
 
 ### Added
