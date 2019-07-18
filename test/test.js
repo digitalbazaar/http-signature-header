@@ -46,6 +46,18 @@ describe('http-signature', () => {
         {includeHeaders: ['date', '(request-target)'], requestOptions});
       stringToSign.should.equal(`date: ${date}\n(request-target): get /1/2/3`);
     });
+    it('properly encodes `(request-target)` with a relative path', () => {
+      const date = new Date().toUTCString();
+      const requestOptions = {
+        headers: {date},
+        method: 'GET',
+        url: '/relative/path',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['date', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `date: ${date}\n(request-target): get /relative/path`);
+    });
     it('properly encodes `(request-target)` with post method', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
