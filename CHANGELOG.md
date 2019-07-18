@@ -1,6 +1,6 @@
 # http-signature-header
 
-## 1.3.1 - 2019-07-xx
+## 1.3.1 - 2019-07-18
 
 ### Fixed
 - Do not use full URL in `(request-target)`.
