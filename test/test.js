@@ -69,6 +69,7 @@ describe('http-signature', () => {
         {includeHeaders: ['date', '(request-target)'], requestOptions});
       stringToSign.should.equal(`date: ${date}\n(request-target): post /`);
     });
+
     it('properly encodes `host`', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
@@ -81,6 +82,7 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `host: example.com\ndate: ${date}\n(request-target): get /1/2/3`);
     });
+
     it('properly encodes `host` with a port', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
@@ -93,6 +95,35 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `host: example.com:18443\ndate: ${date}\n(request-target): get /1/2/3`);
     });
+
+    it('properly encodes a header with a zero-length value', () => {
+      const date = new Date().toUTCString();
+      const zero = '';
+      const requestOptions = {
+        headers: {date, zero},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['host', 'date', 'zero'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\ndate: ${date}\nzero: `);
+    });
+
+    it('properly encodes a header that\'s value is all white spaces', () => {
+      const date = new Date().toUTCString();
+      const zero = '  ';
+      const requestOptions = {
+        headers: {date, zero},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['host', 'date', 'zero'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\ndate: ${date}\nzero: `);
+    });
+
     it('properly encodes `(created)` with a timestamp', () => {
       const date = Date.now();
       const requestOptions = {
@@ -108,6 +139,7 @@ describe('http-signature', () => {
         `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
     });
+
     it('convert Date objects to unix timestamps', () => {
       const date = new Date();
       const requestOptions = {
@@ -184,6 +216,7 @@ describe('http-signature', () => {
         `x-custom: val1, val2\nhost: example.com\ndate: ` +
         `${date}\n(request-target): get /1/2/3`);
     });
+
     it('throws when an unknown header is specified', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
