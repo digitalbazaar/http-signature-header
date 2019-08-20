@@ -51,13 +51,13 @@ function getHTTPSignatureAlgorithm(algorithm) {
 function validate(options) {
   const now = Date.now();
   if(!isNaN(options.created)) {
-    if(options.created > now) {
+    if(options.created * 1000 > now) {
       throw new Error(
         'Invalid created. Your created parameter is in the future');
     }
   }
   if(!isNaN(options.expires)) {
-    if(options.expires < now) {
+    if(options.expires * 1000 < now) {
       throw new Error('Your signature has expired.');
     }
   }
