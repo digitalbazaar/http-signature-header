@@ -12,6 +12,16 @@ const HttpSignatureError = require('../lib/HttpSignatureError');
 
 describe('http-signature', () => {
 
+  describe('createDigestString', () => {
+    it('should create a digest of a given string', async () => {
+      const data = `{"hello": "world"}`;
+      const result = await httpSignatureHeader.
+        createDigestString({data, algorithm: 'sha256', useMultihash: false});
+      result.should
+        .equal('SHA-256=X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=');
+    });
+  });
+
   describe('createSignatureString API', () => {
     it('uses `date` header if specified', () => {
       const date = new Date().toUTCString();
