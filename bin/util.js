@@ -95,7 +95,7 @@ function validatePrivateKey(keyObj) {
  * @param {Array<string>} options.includeHeaders - Which headers
  * to use in the Signing String.
  *
- * @returns {Object} The response headers.
+ * @returns {object} The response headers.
 */
 async function createHttpSignatureRequest({
   algorithm = 'hs2019', privateKey, keyType,
@@ -103,7 +103,7 @@ async function createHttpSignatureRequest({
 }) {
   // get metadata from public key
   if(!keyType) {
-    throw new Error('Expected to recieve keyType');
+    throw new Error('Expected to receive keyType.');
   }
   requestOptions.headers = requestOptions.headers || {};
   if(!requestOptions.headers.date) {
