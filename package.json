@@ -7,7 +7,12 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "mocha ./test",
+    "test": "npm run test-node",
+    "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.js",
+    "benchmark": "node benchmark/benchmark.js",
+    "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary npm run test-node",
+    "coverage-ci": "cross-env NODE_ENV=test nyc --reporter=text-lcov npm run test-node > coverage.lcov",
+    "coverage-report": "nyc report",
     "lint": "eslint lib bin"
   },
   "repository": {
@@ -28,10 +33,12 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-digitalbazaar": "^2.0.0",
     "eslint-plugin-jsdoc": "^4.8.3",
-    "mocha": "^5.1.1",
+    "mocha": "^6.0.0",
+    "nyc": "^15.0.1",
     "uuid": "^3.2.1"
   },
   "browser": {
@@ -39,5 +46,10 @@
   },
   "engines": {
     "node": ">=8.6.0"
+  },
+  "nyc": {
+    "exclude": [
+      "tests"
+    ]
   }
 }

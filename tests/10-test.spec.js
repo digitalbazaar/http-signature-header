@@ -7,7 +7,7 @@ const chai = require('chai');
 chai.should();
 
 const {expect} = chai;
-const httpSignatureHeader = require('..');
+const httpSignatureHeader = require('../lib');
 const HttpSignatureError = require('../lib/HttpSignatureError');
 
 describe('http-signature', () => {
