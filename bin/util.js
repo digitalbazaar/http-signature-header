@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const httpSigs = require('../lib/');
 const jsprim = require('jsprim');
 
+// produces the HTTP headers to be returned
 function makeHTTPHeaders(headers = {}) {
   let message = '';
   for(const key in headers) {
@@ -221,5 +222,5 @@ exports.verify = async function(
   if(verified) {
     return canonicalizedString.toString('utf8');
   }
-  return 'Signature verification failed.';
+  throw new Error('Signature verification failed.');
 };
