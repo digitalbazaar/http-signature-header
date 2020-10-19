@@ -44,26 +44,6 @@ function getHTTPSignatureAlgorithm(algorithm) {
 }
 
 /**
- * Runs validates on various fields.
- *
- * @param {Object} options - Command line options.
- */
-function validate(options) {
-  const now = Date.now();
-  if(!isNaN(options.created)) {
-    if(options.created * 1000 > now) {
-      throw new Error(
-        'Invalid created. Your created parameter is in the future');
-    }
-  }
-  if(!isNaN(options.expires)) {
-    if(options.expires * 1000 < now) {
-      throw new Error('Your signature has expired.');
-    }
-  }
-}
-
-/**
  * Simple validator for a private key that ensures
  * the key is either secret for hmac or private.
  *
