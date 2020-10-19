@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2018 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2018-2020 Digital Bazaar, Inc. All rights reserved.
  */
 'use strict';
 
@@ -139,6 +139,21 @@ describe('http-signature', () => {
         `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
     });
+    it('properly encodes `(created)` as a string', () => {
+      const date = String(Math.round(Date.now() / 1000));
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders:
+          ['host', '(created)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(created): ${date}\n` +
+        `(request-target): get /1/2/3`);
+    });
     it('rejects `(created)` in the future', () => {
       const date = Math.round(Date.now() / 1000) + 2000;
       const requestOptions = {
@@ -202,6 +217,21 @@ describe('http-signature', () => {
 
     it('properly encodes `(expires)` with a timestamp', () => {
       const date = Math.round(Date.now() / 1000) + 120;
+      const requestOptions = {
+        headers: {},
+        expires: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders:
+          ['host', '(expires)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(expires): ${date}\n` +
+        `(request-target): get /1/2/3`);
+    });
+    it('properly encodes `(expires)` as a string', () => {
+      const date = String(Math.round(Date.now() / 1000) + 120);
       const requestOptions = {
         headers: {},
         expires: date,
