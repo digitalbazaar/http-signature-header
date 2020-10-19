@@ -125,7 +125,7 @@ describe('http-signature', () => {
     });
 
     it('properly encodes `(created)` with a timestamp', () => {
-      const date = Date.now();
+      const date = Math.round(Date.now() / 1000);
       const requestOptions = {
         headers: {},
         created: date,
@@ -139,9 +139,31 @@ describe('http-signature', () => {
         `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
     });
-
+    it('rejects `(created)` in the future', () => {
+      const date = Math.round(Date.now() / 1000) + 2000;
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.createSignatureString(
+          {includeHeaders:
+            ['host', '(created)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal(
+        'Invalid created. Your created psuedo-header is in the future');
+    });
     it('convert Date objects to unix timestamps', () => {
       const date = new Date();
+      const timestamp = Math.round(date.getTime() / 1000);
       const requestOptions = {
         headers: {},
         created: date,
@@ -152,12 +174,12 @@ describe('http-signature', () => {
         {includeHeaders:
           ['host', '(created)', '(request-target)'], requestOptions});
       stringToSign.should.equal(
-        `host: example.com:18443\n(created): ${date.getTime()}\n` +
+        `host: example.com:18443\n(created): ${timestamp}\n` +
         `(request-target): get /1/2/3`);
     });
 
     it('properly encodes `(expires)` with a timestamp', () => {
-      const date = Date.now() + 1000;
+      const date = Math.round(Date.now() / 1000) + 120;
       const requestOptions = {
         headers: {},
         expires: date,
@@ -170,6 +192,27 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `host: example.com:18443\n(expires): ${date}\n` +
         `(request-target): get /1/2/3`);
+    });
+    it('rejects `(expires)` in the past', () => {
+      const date = Math.round(Date.now() / 1000) - 120;
+      const requestOptions = {
+        headers: {},
+        expires: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.createSignatureString(
+          {includeHeaders:
+            ['host', '(expires)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('Your signature has expired.');
     });
     it('properly encodes `(key-id)` with an iri', () => {
       const iri = 'https://example.com/key.pub';
