@@ -159,7 +159,7 @@ describe('http-signature', () => {
       expect(result, 'result should not exist').to.be.null;
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal(
-        'Invalid created. Your created psuedo-header is in the future');
+        'Invalid created. Your created pseudo-header is in the future');
     });
     it('convert Date objects to unix timestamps', () => {
       const date = new Date();
