@@ -125,7 +125,7 @@ describe('http-signature', () => {
     });
 
     it('properly encodes `(created)` with a timestamp', () => {
-      const date = Math.floor(Date.now() / 1000);
+      const date = Math.ceil(Date.now() / 1000);
       const requestOptions = {
         headers: {},
         created: date,
@@ -140,7 +140,7 @@ describe('http-signature', () => {
         `(request-target): get /1/2/3`);
     });
     it('properly encodes `(created)` as a string', () => {
-      const date = String(Math.floor(Date.now() / 1000));
+      const date = String(Math.ceil(Date.now() / 1000));
       const requestOptions = {
         headers: {},
         created: date,
@@ -200,7 +200,7 @@ describe('http-signature', () => {
     });
     it('convert Date objects to unix timestamps', () => {
       const date = new Date();
-      const timestamp = Math.floor(date.getTime() / 1000);
+      const timestamp = Math.ceil(date.getTime() / 1000);
       const requestOptions = {
         headers: {},
         created: date,
@@ -216,7 +216,7 @@ describe('http-signature', () => {
     });
 
     it('properly encodes `(expires)` with a timestamp', () => {
-      const date = Math.ceil(Date.now() / 1000) + 120;
+      const date = Math.floor(Date.now() / 1000) + 120;
       const requestOptions = {
         headers: {},
         expires: date,
@@ -231,7 +231,7 @@ describe('http-signature', () => {
         `(request-target): get /1/2/3`);
     });
     it('properly encodes `(expires)` as a string', () => {
-      const date = String(Math.ceil(Date.now() / 1000) + 120);
+      const date = String(Math.floor(Date.now() / 1000) + 120);
       const requestOptions = {
         headers: {},
         expires: date,
@@ -246,7 +246,7 @@ describe('http-signature', () => {
         `(request-target): get /1/2/3`);
     });
     it('rejects `(expires)` in the past', () => {
-      const date = Math.ceil(Date.now() / 1000) - 120;
+      const date = Math.floor(Date.now() / 1000) - 120;
       const requestOptions = {
         headers: {},
         expires: date,
