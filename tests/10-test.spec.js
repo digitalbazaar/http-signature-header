@@ -161,6 +161,28 @@ describe('http-signature', () => {
       error.message.should.equal(
         'Invalid created. Your created pseudo-header is in the future');
     });
+    it('rejects `(created)` that is not a unix timestamp', () => {
+      const date = 'not a date';
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.createSignatureString(
+          {includeHeaders:
+            ['host', '(created)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal(
+        '"created" must be a UNIX timestamp or JavaScript Date.');
+    });
     it('convert Date objects to unix timestamps', () => {
       const date = new Date();
       const timestamp = Math.round(date.getTime() / 1000);
@@ -213,6 +235,28 @@ describe('http-signature', () => {
       expect(result, 'result should not exist').to.be.null;
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('Your signature has expired.');
+    });
+    it('rejects `(expires)` that is not a unix timestamp', () => {
+      const date = 'not a date';
+      const requestOptions = {
+        headers: {},
+        expires: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.createSignatureString(
+          {includeHeaders:
+            ['host', '(expires)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal(
+        '"expires" must be a UNIX timestamp or JavaScript Date.');
     });
     it('properly encodes `(key-id)` with an iri', () => {
       const iri = 'https://example.com/key.pub';
