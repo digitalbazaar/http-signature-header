@@ -135,7 +135,6 @@ exports.sign = async function(
     headers, keyType, privateKey,
     algorithm
   } = program;
-  validate(program);
   if(!keyType) {
     throw new Error('key type is required for signing');
   }
@@ -166,7 +165,6 @@ exports.verify = async function(
     * 5. pass publicKey, canonziedString, and decoded signature bytes to verify
    */
   const {headers = '', keyType, algorithm = 'hs2019'} = program;
-  validate(program);
   const includeHeaders = headers;
   let canonicalizedString = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
