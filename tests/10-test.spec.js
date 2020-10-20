@@ -355,7 +355,7 @@ describe('http-signature', () => {
     const now = 3;
     it('properly encodes `(created)` with a timestamp', () => {
       const date = Math.floor(Date.now() / 1000);
-      const requestOptions = {
+      const request = {
         headers: {},
         created: date,
         method: 'GET',
