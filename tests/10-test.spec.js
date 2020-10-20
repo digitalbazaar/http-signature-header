@@ -124,170 +124,6 @@ describe('http-signature', () => {
         `host: example.com:18443\ndate: ${date}\nzero: `);
     });
 
-    it('properly encodes `(created)` with a timestamp', () => {
-      const date = Math.ceil(Date.now() / 1000);
-      const requestOptions = {
-        headers: {},
-        created: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders:
-          ['host', '(created)', '(request-target)'], requestOptions});
-      stringToSign.should.equal(
-        `host: example.com:18443\n(created): ${date}\n` +
-        `(request-target): get /1/2/3`);
-    });
-    it('properly encodes `(created)` as a string', () => {
-      const date = String(Math.ceil(Date.now() / 1000));
-      const requestOptions = {
-        headers: {},
-        created: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders:
-          ['host', '(created)', '(request-target)'], requestOptions});
-      stringToSign.should.equal(
-        `host: example.com:18443\n(created): ${date}\n` +
-        `(request-target): get /1/2/3`);
-    });
-    it('rejects `(created)` in the future', () => {
-      const date = Math.ceil(Date.now() / 1000) + 2000;
-      const requestOptions = {
-        headers: {},
-        created: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      let error = null;
-      let result = null;
-      try {
-        result = httpSignatureHeader.createSignatureString(
-          {includeHeaders:
-            ['host', '(created)', '(request-target)'], requestOptions});
-      } catch(e) {
-        error = e;
-      }
-      expect(result, 'result should not exist').to.be.null;
-      expect(error, 'error should exist').to.not.be.null;
-      error.message.should.equal(
-        'Invalid created. Your created pseudo-header is in the future');
-    });
-    it('rejects `(created)` that is not a unix timestamp', () => {
-      const date = 'not a date';
-      const requestOptions = {
-        headers: {},
-        created: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      let error = null;
-      let result = null;
-      try {
-        result = httpSignatureHeader.createSignatureString(
-          {includeHeaders:
-            ['host', '(created)', '(request-target)'], requestOptions});
-      } catch(e) {
-        error = e;
-      }
-      expect(result, 'result should not exist').to.be.null;
-      expect(error, 'error should exist').to.not.be.null;
-      error.message.should.equal(
-        '"created" must be a UNIX timestamp or JavaScript Date.');
-    });
-    it('convert Date objects to unix timestamps', () => {
-      const date = new Date();
-      const timestamp = Math.ceil(date.getTime() / 1000);
-      const requestOptions = {
-        headers: {},
-        created: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders:
-          ['host', '(created)', '(request-target)'], requestOptions});
-      stringToSign.should.equal(
-        `host: example.com:18443\n(created): ${timestamp}\n` +
-        `(request-target): get /1/2/3`);
-    });
-
-    it('properly encodes `(expires)` with a timestamp', () => {
-      const date = Math.floor(Date.now() / 1000) + 120;
-      const requestOptions = {
-        headers: {},
-        expires: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders:
-          ['host', '(expires)', '(request-target)'], requestOptions});
-      stringToSign.should.equal(
-        `host: example.com:18443\n(expires): ${date}\n` +
-        `(request-target): get /1/2/3`);
-    });
-    it('properly encodes `(expires)` as a string', () => {
-      const date = String(Math.floor(Date.now() / 1000) + 120);
-      const requestOptions = {
-        headers: {},
-        expires: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders:
-          ['host', '(expires)', '(request-target)'], requestOptions});
-      stringToSign.should.equal(
-        `host: example.com:18443\n(expires): ${date}\n` +
-        `(request-target): get /1/2/3`);
-    });
-    it('rejects `(expires)` in the past', () => {
-      const date = Math.floor(Date.now() / 1000) - 120;
-      const requestOptions = {
-        headers: {},
-        expires: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      let error = null;
-      let result = null;
-      try {
-        result = httpSignatureHeader.createSignatureString(
-          {includeHeaders:
-            ['host', '(expires)', '(request-target)'], requestOptions});
-      } catch(e) {
-        error = e;
-      }
-      expect(result, 'result should not exist').to.be.null;
-      expect(error, 'error should exist').to.not.be.null;
-      error.message.should.equal('Your signature has expired.');
-    });
-    it('rejects `(expires)` that is not a unix timestamp', () => {
-      const date = 'not a date';
-      const requestOptions = {
-        headers: {},
-        expires: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      let error = null;
-      let result = null;
-      try {
-        result = httpSignatureHeader.createSignatureString(
-          {includeHeaders:
-            ['host', '(expires)', '(request-target)'], requestOptions});
-      } catch(e) {
-        error = e;
-      }
-      expect(result, 'result should not exist').to.be.null;
-      expect(error, 'error should exist').to.not.be.null;
-      error.message.should.equal(
-        '"expires" must be a UNIX timestamp or JavaScript Date.');
-    });
     it('properly encodes `(key-id)` with an iri', () => {
       const iri = 'https://example.com/key.pub';
       const requestOptions = {
@@ -422,6 +258,173 @@ describe('http-signature', () => {
       authz.should.equal('Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target)",' +
         'signature="mockSignature"');
+    });
+  });
+  describe.skip('parseRequest api', function() {
+    const now = 3;
+    it('properly encodes `(created)` with a timestamp', () => {
+      const date = Math.floor(Date.now() / 1000);
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.parseRequest(
+        {includeHeaders:
+          ['host', '(created)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(created): ${date}\n` +
+        `(request-target): get /1/2/3`);
+    });
+    it('properly encodes `(created)` as a string', () => {
+      const date = String(Math.floor(Date.now() / 1000));
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.parseRequest(
+        {includeHeaders:
+          ['host', '(created)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(created): ${date}\n` +
+        `(request-target): get /1/2/3`);
+    });
+    it('rejects `(created)` in the future', () => {
+      const date = Math.floor(Date.now() / 1000) + 2000;
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          {includeHeaders:
+            ['host', '(created)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal(
+        'Invalid created. Your created pseudo-header is in the future');
+    });
+    it('rejects `(created)` that is not a unix timestamp', () => {
+      const date = 'not a date';
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          {includeHeaders:
+            ['host', '(created)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal(
+        '"created" must be a UNIX timestamp or JavaScript Date.');
+    });
+    it('convert Date objects to unix timestamps', () => {
+      const date = new Date();
+      const timestamp = Math.floor(date.getTime() / 1000);
+      const requestOptions = {
+        headers: {},
+        created: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.parseRequest(
+        {includeHeaders:
+          ['host', '(created)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(created): ${timestamp}\n` +
+        `(request-target): get /1/2/3`);
+    });
+
+    it('properly encodes `(expires)` with a timestamp', () => {
+      const date = Math.floor(Date.now() / 1000) + 120;
+      const requestOptions = {
+        headers: {},
+        expires: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.parseRequest(
+        {includeHeaders:
+          ['host', '(expires)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(expires): ${date}\n` +
+        `(request-target): get /1/2/3`);
+    });
+    it('properly encodes `(expires)` as a string', () => {
+      const date = String(Math.floor(Date.now() / 1000) + 120);
+      const requestOptions = {
+        headers: {},
+        expires: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.parseRequest(
+        {includeHeaders:
+          ['host', '(expires)', '(request-target)'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\n(expires): ${date}\n` +
+        `(request-target): get /1/2/3`);
+    });
+    it('rejects `(expires)` in the past', () => {
+      const date = Math.floor(Date.now() / 1000) - 120;
+      const requestOptions = {
+        headers: {},
+        expires: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          {includeHeaders:
+            ['host', '(expires)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('Your signature has expired.');
+    });
+    it('rejects `(expires)` that is not a unix timestamp', () => {
+      const date = 'not a date';
+      const requestOptions = {
+        headers: {},
+        expires: date,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          {includeHeaders:
+            ['host', '(expires)', '(request-target)'], requestOptions});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal(
+        '"expires" must be a UNIX timestamp or JavaScript Date.');
     });
   });
 });
