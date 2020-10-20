@@ -351,39 +351,84 @@ describe('http-signature', () => {
     });
 
   });
-  describe.skip('parseRequest api', function() {
+  describe('parseRequest api', function() {
+    const shouldBeParsed = parsed => {
+      parsed.should.have.property('params');
+      parsed.params.should.be.an('object');
+      parsed.should.have.property('scheme');
+      parsed.scheme.should.be.a('string');
+      parsed.should.have.property('signingString');
+      parsed.signingString.should.be.a('string');
+      parsed.should.have.property('algorithm');
+      parsed.should.have.property('keyId');
+      parsed.keyId.should.be.a('string');
+    };
+    // tests occur 3 seconds after the epoch
     const now = 3;
     it('properly encodes `(created)` with a timestamp', () => {
-      const date = Math.floor(Date.now() / 1000);
+      const created = 1;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`;
       const request = {
-        headers: {},
-        created: date,
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(created).toUTCString(),
+          authorization
+        },
+        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
       const expectedHeaders = ['host', '(created)', '(request-target)'];
       const parsed = httpSignatureHeader.parseRequest(
         request, {headers: expectedHeaders, now});
-      console.log({parsed});
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.created, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.created.should.equal(String(created));
+      parsed.signingString.should.contain(`(created): ${created}`);
     });
     it('properly encodes `(created)` as a string', () => {
-      const date = String(Math.floor(Date.now() / 1000));
+      const created = 1;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`;
       const request = {
-        headers: {},
-        created: date,
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(created).toUTCString(),
+          authorization
+        },
+        created: String(created),
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
       const expectedHeaders = ['host', '(created)', '(request-target)'];
       const parsed = httpSignatureHeader.parseRequest(
         request, {headers: expectedHeaders, now});
-      console.log({parsed});
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.created, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.created.should.equal(String(created));
+      parsed.signingString.should.contain(`(created): ${created}`);
     });
     it('rejects `(created)` in the future', () => {
-      const date = Math.floor(Date.now() / 1000) + 2000;
+      const created = 4;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`;
       const request = {
-        headers: {},
-        created: date,
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(created).toUTCString(),
+          authorization
+        },
+        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -399,13 +444,20 @@ describe('http-signature', () => {
       expect(result, 'result should not exist').to.be.null;
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal(
-        'Invalid created. Your created pseudo-header is in the future');
+        'Invalid signature; the signature creation time is in the future.');
     });
     it('rejects `(created)` that is not a unix timestamp', () => {
-      const date = 'not a date';
+      const created = 'not a date';
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`;
       const request = {
-        headers: {},
-        created: date,
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(created).toUTCString(),
+          authorization
+        },
+        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -424,10 +476,17 @@ describe('http-signature', () => {
         '"created" must be a UNIX timestamp or JavaScript Date.');
     });
     it('convert (created) Date objects to unix timestamps', () => {
-      const date = new Date();
+      const date = new Date(1);
       const timestamp = Math.floor(date.getTime() / 1000);
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${timestamp}"`;
       const request = {
-        headers: {},
+        headers: {
+          host: 'example.com:18443',
+          date,
+          authorization
+        },
         created: date,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
@@ -435,7 +494,13 @@ describe('http-signature', () => {
       const expectedHeaders = ['host', '(created)', '(request-target)'];
       const parsed = httpSignatureHeader.parseRequest(
         request, {headers: expectedHeaders, now});
-      console.log({parsed});
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.created, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.created.should.equal(String(timestamp));
+      parsed.signingString.should.contain(`(created): ${timestamp}`);
     });
 
     it('properly encodes `(expires)` with a timestamp', () => {
