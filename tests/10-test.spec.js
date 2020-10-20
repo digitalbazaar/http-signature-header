@@ -504,57 +504,69 @@ describe('http-signature', () => {
     });
 
     it('properly encodes `(expires)` with a timestamp', () => {
-      const date = Math.floor(Date.now() / 1000) + 120;
+      const expires = 3;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (expires)",' +
+        `signature="mockSignature",expires="${expires}"`;
       const request = {
-        headers: {},
-        expires: date,
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(expires),
+          authorization
+        },
+        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
       const expectedHeaders = ['host', '(expires)', '(request-target)'];
       const parsed = httpSignatureHeader.parseRequest(
         request, {headers: expectedHeaders, now});
-      console.log({parsed});
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.expires, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.expires.should.equal(String(expires));
+      parsed.signingString.should.contain(`(expires): ${expires}`);
     });
     it('properly encodes `(expires)` as a string', () => {
-      const date = String(Math.floor(Date.now() / 1000) + 120);
+      const expires = String(3);
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (expires)",' +
+        `signature="mockSignature",expires="${expires}"`;
       const request = {
-        headers: {},
-        expires: date,
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(Number(expires)),
+          authorization
+        },
+        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
       const expectedHeaders = ['host', '(expires)', '(request-target)'];
       const parsed = httpSignatureHeader.parseRequest(
         request, {headers: expectedHeaders, now});
-      console.log({parsed});
-    });
-    it('rejects `(expires)` in the past', () => {
-      const date = Math.floor(Date.now() / 1000) - 120;
-      const request = {
-        headers: {},
-        expires: date,
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      const expectedHeaders = ['host', '(expires)', '(request-target)'];
-      let error = null;
-      let result = null;
-      try {
-        result = httpSignatureHeader.parseRequest(
-          request, {headers: expectedHeaders, now});
-      } catch(e) {
-        error = e;
-      }
-      expect(result, 'result should not exist').to.be.null;
-      expect(error, 'error should exist').to.not.be.null;
-      error.message.should.equal('Your signature has expired.');
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.expires, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.expires.should.equal(expires);
+      parsed.signingString.should.contain(`(expires): ${expires}`);
     });
     it('rejects `(expires)` that is not a unix timestamp', () => {
-      const date = 'not a date';
+      const expires = 'not a date';
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (expires)",' +
+        `signature="mockSignature",expires="${expires}"`;
       const request = {
-        headers: {},
-        expires: date,
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(expires),
+          authorization
+        },
+        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -571,6 +583,34 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal(
         '"expires" must be a UNIX timestamp or JavaScript Date.');
+    });
+    it('rejects `(expires)` that is in the past', () => {
+      const expires = 1;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (expires)",' +
+        `signature="mockSignature",expires="${expires}"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(expires),
+          authorization
+        },
+        expires,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(expires)', '(request-target)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('The signature has expired.');
     });
   });
 });
