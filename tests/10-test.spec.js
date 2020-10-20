@@ -259,6 +259,97 @@ describe('http-signature', () => {
         'headers="date host (request-target)",' +
         'signature="mockSignature"');
     });
+    it('header with integer (created)', () => {
+      const created = Math.floor(Date.now() / 1000);
+      const authz = httpSignatureHeader.createAuthzHeader({
+        includeHeaders: ['date', 'host', '(request-target)', '(created)'],
+        keyId: 'https://example.com/key/1',
+        signature: 'mockSignature',
+        created
+      });
+      authz.should.be.a('string');
+      authz.should.equal('Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`);
+    });
+    it('header with string (created)', () => {
+      const created = String(Math.floor(Date.now() / 1000));
+      const authz = httpSignatureHeader.createAuthzHeader({
+        includeHeaders: ['date', 'host', '(request-target)', '(created)'],
+        keyId: 'https://example.com/key/1',
+        signature: 'mockSignature',
+        created
+      });
+      authz.should.be.a('string');
+      authz.should.equal('Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`);
+    });
+    it('should throw if (created) is not a unix timestamp', () => {
+      const created = 'invalid-date-time';
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.createAuthzHeader({
+          includeHeaders: ['date', 'host', '(request-target)', '(created)'],
+          keyId: 'https://example.com/key/1',
+          signature: 'mockSignature',
+          created
+        });
+      } catch(e) {
+        error = e;
+      }
+      expect(result).to.be.null;
+      expect(error).to.not.be.null;
+      error.message.should.equal(
+        '"created" must be a UNIX timestamp or JavaScript Date.');
+    });
+    it('header with integer (expires)', () => {
+      const expires = Math.floor(Date.now() / 1000);
+      const authz = httpSignatureHeader.createAuthzHeader({
+        includeHeaders: ['date', 'host', '(request-target)', '(expires)'],
+        keyId: 'https://example.com/key/1',
+        signature: 'mockSignature',
+        expires
+      });
+      authz.should.be.a('string');
+      authz.should.equal('Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (expires)",' +
+        `signature="mockSignature",expires="${expires}"`);
+    });
+    it('header with string (expires)', () => {
+      const expires = String(Math.floor(Date.now() / 1000));
+      const authz = httpSignatureHeader.createAuthzHeader({
+        includeHeaders: ['date', 'host', '(request-target)', '(expires)'],
+        keyId: 'https://example.com/key/1',
+        signature: 'mockSignature',
+        expires
+      });
+      authz.should.be.a('string');
+      authz.should.equal('Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (expires)",' +
+        `signature="mockSignature",expires="${expires}"`);
+    });
+    it('should throw if (expires) is not a unix timestamp', () => {
+      const expires = 'invalid-date-time';
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.createAuthzHeader({
+          includeHeaders: ['date', 'host', '(request-target)', '(expires)'],
+          keyId: 'https://example.com/key/1',
+          signature: 'mockSignature',
+          expires
+        });
+      } catch(e) {
+        error = e;
+      }
+      expect(result).to.be.null;
+      expect(error).to.not.be.null;
+      error.message.should.equal(
+        '"expires" must be a UNIX timestamp or JavaScript Date.');
+    });
+
   });
   describe.skip('parseRequest api', function() {
     const now = 3;
