@@ -368,7 +368,7 @@ describe('http-signature', () => {
     });
     it('properly encodes `(created)` as a string', () => {
       const date = String(Math.floor(Date.now() / 1000));
-      const requestOptions = {
+      const request = {
         headers: {},
         created: date,
         method: 'GET',
