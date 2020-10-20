@@ -376,7 +376,7 @@ describe('http-signature', () => {
       };
       const stringToSign = httpSignatureHeader.parseRequest(
         {includeHeaders:
-          ['host', '(created)', '(request-target)'], requestOptions});
+          ['host', '(created)', '(request-target)'], ...request});
       stringToSign.should.equal(
         `host: example.com:18443\n(created): ${date}\n` +
         `(request-target): get /1/2/3`);
