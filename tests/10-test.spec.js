@@ -537,7 +537,9 @@ describe('http-signature', () => {
       const request = {
         headers: {
           host: 'example.com:18443',
-          date: new Date(expires),
+          date: new Date(now * 1000),
+          // convert the unix time to milliseconds for the header
+          expires: new Date(Number(expires) * 1000),
           authorization
         },
         expires,
@@ -563,7 +565,9 @@ describe('http-signature', () => {
       const request = {
         headers: {
           host: 'example.com:18443',
-          date: new Date(Number(expires)),
+          date: new Date(now * 1000),
+          // convert the unix time to milliseconds for the header
+          expires: new Date(Number(expires) * 1000),
           authorization
         },
         expires,
