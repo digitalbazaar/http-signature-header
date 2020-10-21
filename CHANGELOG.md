@@ -1,5 +1,14 @@
 # http-signature-header
 
+## 2.0.0 -
+
+### Fixed
+- Pseudo-headers `created` & `expires` must be unix time stamps or js Dates.
+
+### Added
+- Validators for `created` & `expires`.
+- Tests for `parseRequest`.
+
 ## 1.3.1 - 2019-07-18
 
 ### Fixed
