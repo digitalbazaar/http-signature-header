@@ -365,6 +365,32 @@ describe('http-signature', () => {
     };
     // tests occur 3 seconds after the epoch
     const now = 3;
+    it('should use Date.now() when now is not specified', () => {
+      const created = Math.floor(Date.now() / 1000);
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          date: new Date().toUTCString(),
+          authorization
+        },
+        created,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(created)', '(request-target)'];
+      const parsed = httpSignatureHeader.parseRequest(
+        request, {headers: expectedHeaders});
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.created, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.created.should.equal(String(created));
+      parsed.signingString.should.contain(`(created): ${created}`);
+    });
     it('properly encodes `(created)` with a timestamp', () => {
       const created = 1;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
