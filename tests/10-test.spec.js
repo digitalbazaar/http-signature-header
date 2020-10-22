@@ -696,9 +696,9 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('The request has expired.');
     });
-    it.skip('rejects if skew is greater then clockSkew', () => {
-      const _now = 1000;
-      const date = _now - 300;
+    it('rejects if skew is greater then clockSkew', () => {
+      const _now = 1603386114;
+      const date = _now - 350;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="x-date host (request-target)",' +
         `signature="mockSignature"`;
@@ -722,7 +722,34 @@ describe('http-signature', () => {
       }
       expect(result, 'result should not exist').to.be.null;
       expect(error, 'error should exist').to.not.be.null;
-      error.message.should.equal('The request has expired.');
+      error.message.should.equal('Clock skew of 350s was greater than 300s');
+    });
+    it('rejects if signature is missing from AuthzHeader', () => {
+      const _now = 1000;
+      const date = _now - 300;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="x-date host (request-target)",';
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          'x-date': new Date(date * 1000),
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(request-target)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now: _now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('signature was not specified');
     });
   });
 });
