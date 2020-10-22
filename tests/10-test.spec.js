@@ -805,6 +805,57 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('keyId was not specified');
     });
+    // this is for covered content
+    it('default headers should be (created)', () => {
+      const created = 1;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        `signature="mockSignature",created="${created}"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          'x-date': new Date(created * 1000).toUTCString(),
+          authorization
+        },
+        created,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['(created)'];
+      const parsed = httpSignatureHeader.parseRequest(
+        request, {headers: expectedHeaders, now});
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.created, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.created.should.equal(String(created));
+      parsed.signingString.should.contain(`(created): ${created}`);
+    });
+    it('should error if created and headers are not set', () => {
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        `signature="mockSignature"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(now * 1000).toUTCString(),
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['(created)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('created was not in the request');
+    });
 
   });
 });
