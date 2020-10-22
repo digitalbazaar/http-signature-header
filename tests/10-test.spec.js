@@ -751,5 +751,60 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('signature was not specified');
     });
+    it('rejects if schema is not Signature', () => {
+      const date = now - 1;
+      const authorization = 'NotSignature keyId="https://example.com/key/1",' +
+        'headers="x-date host (request-target)",' +
+        `signature="mockSignature"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          'x-date': new Date(date * 1000),
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(request-target)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('scheme was not "Signature"');
+    });
+    it('rejects if no keyId', () => {
+      const date = now - 1;
+      const authorization = 'Signature ' +
+        'headers="x-date host (request-target)",' +
+        `signature="mockSignature"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          'x-date': new Date(date * 1000),
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(request-target)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('keyId was not specified');
+    });
+
   });
 });
