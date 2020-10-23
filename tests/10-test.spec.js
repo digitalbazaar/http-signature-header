@@ -376,7 +376,6 @@ describe('http-signature', () => {
           date: new Date().toUTCString(),
           authorization
         },
-        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -402,7 +401,6 @@ describe('http-signature', () => {
           date: new Date(created).toUTCString(),
           authorization
         },
-        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -428,7 +426,6 @@ describe('http-signature', () => {
           date: new Date(created).toUTCString(),
           authorization
         },
-        created: String(created),
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -454,7 +451,6 @@ describe('http-signature', () => {
           date: new Date(created).toUTCString(),
           authorization
         },
-        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -483,7 +479,6 @@ describe('http-signature', () => {
           date: new Date(created).toUTCString(),
           authorization
         },
-        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -513,7 +508,6 @@ describe('http-signature', () => {
           date,
           authorization
         },
-        created: date,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -542,7 +536,6 @@ describe('http-signature', () => {
           expires: new Date(Number(expires) * 1000),
           authorization
         },
-        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -568,7 +561,6 @@ describe('http-signature', () => {
           'x-date': new Date(now * 1000),
           authorization
         },
-        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -596,7 +588,6 @@ describe('http-signature', () => {
           expires: new Date(Number(expires) * 1000),
           authorization
         },
-        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -622,7 +613,6 @@ describe('http-signature', () => {
           date: new Date(expires),
           authorization
         },
-        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -651,7 +641,6 @@ describe('http-signature', () => {
           date: new Date(expires),
           authorization
         },
-        expires,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -816,7 +805,6 @@ describe('http-signature', () => {
           'x-date': new Date(created * 1000).toUTCString(),
           authorization
         },
-        created: new Date(created * 1000),
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -855,7 +843,6 @@ describe('http-signature', () => {
       error.message.should.equal('created was not in the request');
     });
     it('should error if expires is in options.headers, but not request', () => {
-      const created = new Date(1000);
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         `signature="mockSignature",created="1"`;
       const request = {
@@ -864,7 +851,6 @@ describe('http-signature', () => {
           date: new Date(now * 1000).toUTCString(),
           authorization
         },
-        created,
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
