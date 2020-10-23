@@ -502,7 +502,7 @@ describe('http-signature', () => {
         '"created" must be a UNIX timestamp or JavaScript Date.');
     });
     it('convert (created) Date objects to unix timestamps', () => {
-      const date = new Date(1);
+      const date = new Date(1000);
       const timestamp = Math.floor(date.getTime() / 1000);
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (created)",' +
@@ -816,7 +816,7 @@ describe('http-signature', () => {
           'x-date': new Date(created * 1000).toUTCString(),
           authorization
         },
-        created,
+        created: new Date(created * 1000),
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -853,6 +853,33 @@ describe('http-signature', () => {
       expect(result, 'result should not exist').to.be.null;
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('created was not in the request');
+    });
+    it('should error if expires is in options.headers, but not request', () => {
+      const created = new Date(1000);
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        `signature="mockSignature",created="1"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(now * 1000).toUTCString(),
+          authorization
+        },
+        created,
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['(expires)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('(expires) was not a signed header');
     });
   });
 });
