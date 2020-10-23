@@ -820,9 +820,8 @@ describe('http-signature', () => {
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const expectedHeaders = ['(created)'];
       const parsed = httpSignatureHeader.parseRequest(
-        request, {headers: expectedHeaders, now});
+        request, {now});
       expect(parsed, 'expected the parsing result to be an object').
         to.be.an('object');
       shouldBeParsed(parsed);
@@ -831,7 +830,7 @@ describe('http-signature', () => {
       parsed.params.created.should.equal(String(created));
       parsed.signingString.should.contain(`(created): ${created}`);
     });
-    it('should error if created and headers are not set', () => {
+    it('should error if both created and headers are not set', () => {
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         `signature="mockSignature"`;
       const request = {
@@ -843,12 +842,11 @@ describe('http-signature', () => {
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const expectedHeaders = ['(created)'];
       let error = null;
       let result = null;
       try {
         result = httpSignatureHeader.parseRequest(
-          request, {headers: expectedHeaders, now});
+          request, {now});
       } catch(e) {
         error = e;
       }
@@ -856,6 +854,5 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('created was not in the request');
     });
-
   });
 });
