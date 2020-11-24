@@ -47,7 +47,7 @@ function getHTTPSignatureAlgorithm(algorithm) {
  * Simple validator for a private key that ensures
  * the key is either secret for hmac or private.
  *
- * @param {Object} keyObj - A node Private Key Object.
+ * @param {object} keyObj - A node Private Key object.
  *
  * @throws If the key is neither secret nor private.
  *
@@ -66,16 +66,16 @@ function validatePrivateKey(keyObj) {
  * This is compatible with both request and axios libraries.
  * TODO: factor out to new npm package.
  *
- * @param {Object} options - Options for the request.
+ * @param {object} options - Options for the request.
  * @param {string} options.algorithm - The signing algorithm
  * to use (rsa-sha256, hs2019).
- * @param {Object} options.requestOptions - The request options.
- * @param {string} options.keyId - A valid IRI
- * that resolves to a public key.
+ * @param {object} options.requestOptions - The request options.
+ * @param {string} options.keyType - The key type.
+ * @param {object} options.privateKey - The private key to sign with.
  * @param {Array<string>} options.includeHeaders - Which headers
  * to use in the Signing String.
  *
- * @returns {Object} The response headers.
+ * @returns {object} The response headers.
 */
 async function createHttpSignatureRequest({
   algorithm = 'hs2019', privateKey, keyType,
@@ -157,12 +157,12 @@ exports.sign = async function(
 exports.verify = async function(
   {program, message: requestOptions, publicKeyFile}) {
   /**
-    * 1. recreate the canonzied string (not hashed, not signed, not base 64)
-    * 1a. might need to hash canonized
-    * 2. get the public key from key id
-    * 3. if there is an algorithm check key is in types
-    * 4. decode the actual `signature` paramter to bytes (not base 64)
-    * 5. pass publicKey, canonziedString, and decoded signature bytes to verify
+    * 1. Recreate the canonzied string (not hashed, not signed, not base 64).
+    * 1a. Might need to hash canonized.
+    * 2. Get the public key from key id.
+    * 3. If there is an algorithm check key is in types.
+    * 4. Decode the actual `signature` paramter to bytes (not base 64).
+    * 5. Pass publicKey, canonziedString, and decoded signature bytes to verify.
    */
   const {headers = '', keyType, algorithm = 'hs2019'} = program;
   const includeHeaders = headers;
