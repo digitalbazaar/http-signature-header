@@ -28,7 +28,7 @@ const hs2019 = {
   }
 };
 
-function getHTTPSignatureAlgorithm(algorithm) {
+function getHTTPSignatureAlgorithm(algorithm = '') {
   if(algorithm === true) {
     throw new Error(
       'Your algorithm is not in the current HTTP Signatures registry');
@@ -38,7 +38,8 @@ function getHTTPSignatureAlgorithm(algorithm) {
       return hs2019;
     }
     default: {
-      throw new Error(`${algorithm} is deprecated or unsupported}`);
+      throw new Error(
+        `algorithm ${algorithm || undefined} is deprecated or unsupported}`);
     }
   }
 }
@@ -164,29 +165,29 @@ exports.verify = async function(
     * 4. Decode the actual `signature` paramter to bytes (not base 64).
     * 5. Pass publicKey, canonziedString, and decoded signature bytes to verify.
    */
-  const {headers = '', keyType, algorithm = 'hs2019'} = program;
+  const {headers = '', keyType} = program;
   const includeHeaders = headers;
-  let canonicalizedString = httpSigs.
-    createSignatureString({includeHeaders, requestOptions});
+  let canonicalizedString = Buffer.from(httpSigs.
+    createSignatureString({includeHeaders, requestOptions}));
   const dereferencedPublicKey = crypto.createPublicKey(publicKeyFile);
-  const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
   const kType = keyType || dereferencedPublicKey.asymmetricKeyType;
-  const valid = httpSignatureAlgorithm.validKey(kType);
-  if(!valid) {
-    throw new Error(`Unsupported signing algorithm ${kType}`);
-  }
   const options = {
     authorizationHeaderName: 'Authorization',
     headers: includeHeaders
   };
   const request = httpSigs.parseRequest(requestOptions, options);
   const signature = new Buffer(request.params.signature, 'base64');
-  if(httpSignatureAlgorithm.hash) {
-    httpSignatureAlgorithm.hash.update(canonicalizedString);
-    canonicalizedString = Buffer.from(
-      httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
+  if(request.algorithm) {
+    const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(request.algorithm);
+    const valid = httpSignatureAlgorithm.validKey(kType);
+    if(!valid) {
+      throw new Error(`Unsupported signing algorithm ${kType}`);
+    }
+    if(httpSignatureAlgorithm.hash) {
+      httpSignatureAlgorithm.hash.update(canonicalizedString);
+      canonicalizedString = Buffer.from(httpSignatureAlgorithm.hash.digest());
+    }
   }
-  // TODO: abstract middleware verify in this.
   // TODO: get options from program env variables.
   const verified = crypto.verify(
     null, canonicalizedString, publicKeyFile, signature);
