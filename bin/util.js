@@ -66,6 +66,22 @@ function validatePrivateKey(keyObj) {
   }
 }
 
+// FIXME this should only contain the string, keyType, and privateKey
+async function getBase64Signature({
+  canonicalizedString,
+  keyType,
+  privateKey,
+  keyObj
+}) {
+  if(keyType === 'hmac') {
+    return crypto.createHmac('SHA512', privateKey)
+      .update(canonicalizedString).digest('base64');
+  }
+  const textBuffer = Buffer.from(canonicalizedString);
+  // sign the textBuffer and return it as a base64 string
+  return crypto.sign(null, textBuffer, keyObj).toString('base64');
+}
+
 /**
  * Add HTTPSignatures headers to a given requestOptions object.
  * This is compatible with both request and axios libraries.
@@ -93,15 +109,15 @@ async function createHttpSignatureRequest({
   }
   // the signature algorithm is used for the algorithm  key-type check
   const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
-  // use an unhashed signature string
   const canonicalizedString = httpSigs.createSignatureString(
     {includeHeaders, requestOptions});
   const authzHeaderOptions = {includeHeaders, keyId: 'test-key'};
-  // this creates the private key used to sign with
+  // FIXME this can be abstracted into a helper function else where
+  // this creates the private key using node's crypto to sign with
   const keyObj = crypto.createPrivateKey(privateKey);
   // ensures the key includes either a "secret" or "private" property
   validatePrivateKey(keyObj);
-  // gets the keyType passed in as lowercase or the private key's type
+  // gets the keyType provided in as lowercase or the private key's type
   const keyType = providedKeyType.trim().toLowerCase() ||
     keyObj.asymmetricKeyType.trim().toLowerCase();
   // checks that the key type is one allowed by the algorithm
@@ -110,15 +126,9 @@ async function createHttpSignatureRequest({
     throw new Error(
       `Unsupported key type ${keyType} for algorithm ${algorithm}`);
   }
-  if(keyType === 'hmac') {
-    authzHeaderOptions.signature = crypto.createHmac('SHA512', privateKey)
-      .update(canonicalizedString).digest('base64');
-  } else {
-    const textBuffer = Buffer.from(canonicalizedString);
-    // sign the textBuffer and return it as a base64 string
-    authzHeaderOptions.signature = await crypto.sign(
-      null, textBuffer, keyObj).toString('base64');
-  }
+  authzHeaderOptions.signature = await getBase64Signature({
+    keyType, privateKey, canonicalizedString, keyObj
+  });
   requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
     authzHeaderOptions);
   return requestOptions.headers;
@@ -197,7 +207,7 @@ exports.verify = async function(
   const verified = crypto.verify(
     null, canonicalizedString, publicKeyFile, signature);
   if(verified) {
-    return canonicalizedString.toString('utf8');
+    return canonicalizedString.toString();
   }
   return 'Signature verification failed.';
 };
