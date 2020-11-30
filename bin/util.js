@@ -83,13 +83,9 @@ function validatePrivateKey(keyObj) {
  * @returns {object} The response headers.
 */
 async function createHttpSignatureRequest({
-  algorithm = 'hs2019', privateKey, keyType,
+  algorithm = 'hs2019', privateKey, keyType: providedKeyType = '',
   requestOptions, includeHeaders = []
 }) {
-  // get metadata from public key
-  if(!keyType) {
-    throw new Error('Expected to recieve keyType');
-  }
   requestOptions.headers = requestOptions.headers || {};
   // if there is no date set the date to now
   if(!requestOptions.headers.date) {
@@ -103,17 +99,18 @@ async function createHttpSignatureRequest({
   const authzHeaderOptions = {includeHeaders, keyId: 'test-key'};
   // this creates the private key used to sign with
   const keyObj = crypto.createPrivateKey(privateKey);
-  // ensures the includes either a "secret" or "private" property
+  // ensures the key includes either a "secret" or "private" property
   validatePrivateKey(keyObj);
   // gets the keyType passed in as lowercase or the private key's type
-  const keyTypes = keyType.trim().toLowerCase() ||
+  const keyType = providedKeyType.trim().toLowerCase() ||
     keyObj.asymmetricKeyType.trim().toLowerCase();
   // checks that the key type is one allowed by the algorithm
-  const valid = httpSignatureAlgorithm.validKey(keyTypes);
+  const valid = httpSignatureAlgorithm.validKey(keyType);
   if(!valid) {
-    throw new Error(`Unsupported signing algorithm ${keyTypes}`);
+    throw new Error(
+      `Unsupported key type ${keyType} for algorithm ${algorithm}`);
   }
-  if(keyTypes === 'hmac') {
+  if(keyType === 'hmac') {
     authzHeaderOptions.signature = crypto.createHmac('SHA512', privateKey)
       .update(canonicalizedString).digest('base64');
   } else {
@@ -147,9 +144,6 @@ exports.sign = async function(
     headers, keyType, privateKey,
     algorithm
   } = program;
-  if(!keyType) {
-    throw new Error('key type is required for signing');
-  }
   if(!privateKey) {
     throw new Error('A private key is required for signing');
   }
