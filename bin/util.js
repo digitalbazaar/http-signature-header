@@ -15,7 +15,6 @@ function makeHTTPHeaders(headers = {}) {
 }
 
 const hs2019 = {
-  hash: crypto.createHash('SHA512'),
   dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ec/i, /^p256/i],
   validKey(key) {
     return hs2019.dsa
@@ -90,26 +89,32 @@ async function createHttpSignatureRequest({
   if(!requestOptions.headers.date) {
     requestOptions.headers.date = jsprim.rfc1123(new Date());
   }
+  // the signature algorithm is used for the algorithm  key-type check
   const httpSignatureAlgorithm = getHTTPSignatureAlgorithm(algorithm);
-  const plaintext = httpSigs.createSignatureString(
+  // use an unhashed signature string
+  const canonicalizedString = httpSigs.createSignatureString(
     {includeHeaders, requestOptions});
-  httpSignatureAlgorithm.hash.update(plaintext);
   const authzHeaderOptions = {includeHeaders, keyId: 'test-key'};
+  // this creates the private key used to sign with
   const keyObj = crypto.createPrivateKey(privateKey);
+  // ensures the includes either a "secret" or "private" property
   validatePrivateKey(keyObj);
-  const keyTypes = keyType.trim().toLowerCase() || keyObj.asymmetricKeyType;
+  // gets the keyType passed in as lowercase or the private key's type
+  const keyTypes = keyType.trim().toLowerCase() ||
+    keyObj.asymmetricKeyType.trim().toLowerCase();
+  // checks that the key type is one allowed by the algorithm
   const valid = httpSignatureAlgorithm.validKey(keyTypes);
   if(!valid) {
     throw new Error(`Unsupported signing algorithm ${keyTypes}`);
   }
   if(keyTypes === 'hmac') {
     authzHeaderOptions.signature = crypto.createHmac('SHA512', privateKey)
-      .update(plaintext).digest('base64');
+      .update(canonicalizedString).digest('base64');
   } else {
-    const hashText = Buffer.from(
-      httpSignatureAlgorithm.hash.digest('utf8'), 'utf8');
+    const textBuffer = Buffer.from(canonicalizedString);
+    // sign the textBuffer and return it as a base64 string
     authzHeaderOptions.signature = await crypto.sign(
-      null, hashText, keyObj).toString('base64');
+      null, textBuffer, keyObj).toString('base64');
   }
   requestOptions.headers.Authorization = httpSigs.createAuthzHeader(
     authzHeaderOptions);
