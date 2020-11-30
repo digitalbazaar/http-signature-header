@@ -14,11 +14,15 @@ function makeHTTPHeaders(headers = {}) {
   return message;
 }
 
+// this is the hs 2019 algorithm with no hash
 const hs2019 = {
+  // these are the key types that hs2019 supports
   dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ec/i, /^p256/i],
   validKey(key) {
+    // reduce our array of regexps to a boolean
     return hs2019.dsa
       .reduce((any, current) => {
+        // if any of the keys matched return true
         if(any) {
           return any;
         }
@@ -28,6 +32,7 @@ const hs2019 = {
 };
 
 function getHTTPSignatureAlgorithm(algorithm = '') {
+  // FIXME this is definitely not a good pattern
   if(algorithm === true) {
     throw new Error(
       'Your algorithm is not in the current HTTP Signatures registry');
@@ -86,6 +91,7 @@ async function createHttpSignatureRequest({
     throw new Error('Expected to recieve keyType');
   }
   requestOptions.headers = requestOptions.headers || {};
+  // if there is no date set the date to now
   if(!requestOptions.headers.date) {
     requestOptions.headers.date = jsprim.rfc1123(new Date());
   }
