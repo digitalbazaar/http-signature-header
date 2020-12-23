@@ -184,6 +184,31 @@ describe('http-signature', () => {
         `${date}\n(request-target): get /1/2/3`);
     });
 
+    it('properly encodes using header parameter order', () => {
+      const date = new Date().toUTCString();
+      const requestOptions = {
+        headers: {date},
+        method: 'GET',
+        url: 'https://example.com/1/2/3',
+      };
+      // 2 different signatures with the same parameters
+      // in a different order
+      const firstString = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['host', 'date', '(request-target)'],
+          requestOptions});
+      firstString.should.equal(
+        `host: example.com\ndate: ${date}\n` +
+        `(request-target): get /1/2/3`);
+      // the header parameters have the same value, but are in a different order
+      const secondString = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['(request-target)', 'host', 'date'],
+          requestOptions});
+      secondString.should.not.equal(firstString);
+      secondString.should.equal(
+        `(request-target): get /1/2/3\nhost: example.com\ndate: ` +
+        `${date}`);
+    });
+
     it('throws when an unknown header is specified', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
