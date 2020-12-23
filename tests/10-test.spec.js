@@ -391,6 +391,7 @@ describe('http-signature', () => {
 
   });
   describe('parseRequest api', function() {
+    // takes the result of parseRequest and tests it
     const shouldBeParsed = parsed => {
       parsed.should.have.property('params');
       parsed.params.should.be.an('object');
@@ -857,6 +858,30 @@ describe('http-signature', () => {
       parsed.params.created.should.equal(String(created));
       parsed.signingString.should.contain(`(created): ${created}`);
     });
+    it('should error if headers parameter is zero-length', () => {
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        `headers="",signature="mockSignature"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('created was not in the request');
+    });
+
     it('should error if both created and headers are not set', () => {
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         `signature="mockSignature"`;
