@@ -376,7 +376,7 @@ describe('http-signature', () => {
     });
 
   });
-  describe('parseRequest api', function() {
+  describe('parseRequest API', function() {
     // takes the result of parseRequest and tests it
     const shouldBeParsed = parsed => {
       parsed.should.have.property('params');
@@ -820,6 +820,35 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('keyId was not specified');
     });
+    it('should ignore unrecognized signature parameters', () => {
+      const created = Math.floor(Date.now() / 1000);
+      const unrecognized = 'unrecognized';
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}",` +
+        `unrecognized="${unrecognized}"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          date: new Date().toUTCString(),
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(created)', '(request-target)'];
+      const parsed = httpSignatureHeader.parseRequest(
+        request, {headers: expectedHeaders});
+      expect(parsed, 'expected the parsing result to be an object').
+        to.be.an('object');
+      shouldBeParsed(parsed);
+      expect(parsed.params.created, 'expected created to be a string').
+        to.be.a('string');
+      parsed.params.created.should.equal(String(created));
+      parsed.signingString.should.contain(`(created): ${created}`);
+      parsed.signingString.should.not.contain(unrecognized);
+    });
+
     // this is for covered content
     it('default headers should be (created)', () => {
       const created = 1;
