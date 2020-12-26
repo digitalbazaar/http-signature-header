@@ -822,6 +822,7 @@ describe('http-signature', () => {
     });
     it('should ignore unrecognized signature parameters', () => {
       const created = Math.floor(Date.now() / 1000);
+      // note: this test adds a single unrecognized signature parameter
       const unrecognized = 'unrecognized';
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (created)",' +
