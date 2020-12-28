@@ -169,6 +169,70 @@ describe('http-signature', () => {
         `(request-target): get /1/2/3`);
     });
 
+    const algorithms = ['rsa', 'hmac', 'ecdsa'];
+
+    for(const algorithm of algorithms) {
+      it(`properly encodes when using algorithm ${algorithm}`, () => {
+        const requestOptions = {
+          headers: {},
+          algorithm,
+          method: 'GET',
+          url: 'https://example.com:18443/1/2/3',
+        };
+        const includeHeaders = ['host', '(algorithm)', '(request-target)'];
+        const stringToSign = httpSignatureHeader.createSignatureString(
+          {includeHeaders, requestOptions});
+        stringToSign.should.equal(
+          `host: example.com:18443\n(algorithm): ${algorithm}\n` +
+        `(request-target): get /1/2/3`);
+      });
+
+      it('throws when `(created)` is used with algorithm ' + algorithm, () => {
+        const requestOptions = {
+          headers: {},
+          algorithm,
+          method: 'GET',
+          url: 'https://example.com:18443/1/2/3',
+        };
+        const includeHeaders = ['(created)', '(algorithm)', '(request-target)'];
+        let result;
+        let error;
+        try {
+          result = httpSignatureHeader.createSignatureString(
+            {includeHeaders, requestOptions});
+        } catch(e) {
+          error = e;
+        }
+        expect(result).to.be.undefined;
+        expect(error).to.not.be.undefined;
+        error.message.should.equal(
+          `Algorithm ${algorithm} does not support "(created)".`);
+      });
+
+      it('throws when `(expires)` is used with algorithm ' + algorithm, () => {
+        const requestOptions = {
+          headers: {},
+          algorithm,
+          method: 'GET',
+          url: 'https://example.com:18443/1/2/3',
+        };
+        const includeHeaders = ['(expires)', '(algorithm)', '(request-target)'];
+        let result;
+        let error;
+        try {
+          result = httpSignatureHeader.createSignatureString(
+            {includeHeaders, requestOptions});
+        } catch(e) {
+          error = e;
+        }
+        expect(result).to.be.undefined;
+        expect(error).to.not.be.undefined;
+        error.message.should.equal(
+          `Algorithm ${algorithm} does not support "(expires)".`);
+      });
+
+    }
+
     it('properly encodes a header with multiple values', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
