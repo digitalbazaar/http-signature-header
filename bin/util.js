@@ -14,13 +14,19 @@ function makeHTTPHeaders(headers = {}) {
   return message;
 }
 
-// this is the hs 2019 algorithm with no hash
-const hs2019 = {
-  // these are the key types that hs2019 supports
-  dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ec/i, /^p256/i],
+/**
+ * Creates a signature validadtor.
+ *
+ * @param {object} options - Options to use.
+ * @param {Array<RegExp>} options.dsa - A list of RegExp(s) to verify the key.
+ * @param {Function} options.hash - An optional hash.
+ *
+ * @returns {object} A signature object.
+*/
+const createSignatureVerifier = ({dsa, hash}) => ({
+  hash, dsa,
   validKey(key) {
-    // reduce our array of regexps to a boolean
-    return hs2019.dsa
+    return dsa
       .reduce((any, current) => {
         // if any of the keys matched return true
         if(any) {
@@ -29,7 +35,7 @@ const hs2019 = {
         return current.test(key);
       }, false);
   }
-};
+});
 
 function getHTTPSignatureAlgorithm(algorithm = '') {
   // FIXME this is definitely not a good pattern
@@ -39,11 +45,13 @@ function getHTTPSignatureAlgorithm(algorithm = '') {
   }
   switch(algorithm.toLowerCase()) {
     case 'hs2019': {
-      return hs2019;
+      return createSignatureVerifier({
+        dsa: [/^rsa/i, /^hmac/i, /^ed25519/i, /^ec/i, /^p256/i],
+      });
     }
     default: {
-      throw new Error(
-        `algorithm ${algorithm || undefined} is deprecated or unsupported}`);
+      // all other registered HTTP sig algorithms are deprecated in v12.
+      throw new Error(`${algorithm} is deprecated or unsupported}`);
     }
   }
 }
