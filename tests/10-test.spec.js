@@ -124,6 +124,20 @@ describe('http-signature', () => {
         `host: example.com:18443\ndate: ${date}\nzero: `);
     });
 
+    it('properly encodes a header with multiple values', () => {
+      const date = new Date().toUTCString();
+      const multiple = 'true, false';
+      const requestOptions = {
+        headers: {date, multiple},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureString(
+        {includeHeaders: ['host', 'date', 'multiple'], requestOptions});
+      stringToSign.should.equal(
+        `host: example.com:18443\ndate: ${date}\nmultiple: true, false`);
+    });
+
     it('properly encodes `(key-id)` with an iri', () => {
       const iri = 'https://example.com/key.pub';
       const requestOptions = {
