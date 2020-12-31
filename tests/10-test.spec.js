@@ -910,7 +910,7 @@ describe('http-signature', () => {
       expect(result, 'result should not exist').to.be.null;
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal(
-        'headers parameter can not be a zero-length string');
+        'The "headers" parameter must not be a zero-length string.');
     });
 
     it('should error if both created and headers are not set', () => {
