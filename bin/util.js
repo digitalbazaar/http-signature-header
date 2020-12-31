@@ -181,12 +181,6 @@ exports.verify = async function(
   };
   const request = httpSigs.parseRequest(requestOptions, options);
   const signature = new Buffer(request.params.signature, 'base64');
-  if(!signature) {
-    throw new Error('No signature parameter found in Authorization header');
-  }
-  if(!request.params.keyId) {
-    throw new Error('keyId is required for verification.');
-  }
   if(httpSignatureAlgorithm.hash) {
     httpSignatureAlgorithm.hash.update(canonicalizedString);
     canonicalizedString = Buffer.from(
