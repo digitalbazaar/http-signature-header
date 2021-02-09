@@ -4,10 +4,20 @@
 
 ### Fixed
 - Pseudo-headers `created` & `expires` must be unix time stamps or js Dates.
+- hs2019 does not hash signature string before signing a signature string.
+
+### Changed
+- Library throws if the signature parameter headers is a zero-length string.
+- Library adds default `(created)` if no signature parameter header is present.
 
 ### Added
+- Support for version 12 of the HTTP signature specification.
 - Validators for `created` & `expires`.
 - Tests for `parseRequest`.
+- Tests for headers parameter order.
+- Tests for unrecognized parameters in a signature.
+- Jsdoc strings for library functions and methods.
+- Validation is algorithm specific in some cases.
 
 ## 1.3.1 - 2019-07-18
 
