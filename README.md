@@ -1,6 +1,8 @@
 # HTTP Signature Client _(http-signature-header)_
 
-[![Build status](https://img.shields.io/travis/digitalbazaar/http-signature-header.svg)](https://travis-ci.org/digitalbazaar/http-signature-header)
+[![Build status](https://img.shields.io/github/workflow/status/digitalbazaar/http-signature-header/Node.js%20CI)](https://github.com/digitalbazaar/http-signature-header/actions?query=workflow%3A%22Node.js+CI%22)
+[![Coverage status](https://img.shields.io/codecov/c/github/digitalbazaar/http-signature-header)](https://codecov.io/gh/digitalbazaar/http-signature-header)
+[![Dependency Status](https://img.shields.io/david/digitalbazaar/http-signature-header.svg)](https://david-dm.org/digitalbazaar/http-signature-header)
 
 > A JavaScript library for creating and verifying HTTP Signature headers
 
