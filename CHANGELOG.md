@@ -19,6 +19,7 @@
 - Tests for unrecognized parameters in a signature.
 - Jsdoc strings for library functions and methods.
 - Validation is algorithm specific in some cases.
+- Test browser support with karma.
 
 ## 1.3.1 - 2019-07-18
 
