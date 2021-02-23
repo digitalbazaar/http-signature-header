@@ -9,6 +9,7 @@
 ### Changed
 - Library throws if the signature parameter headers is a zero-length string.
 - Library adds default `(created)` if no signature parameter header is present.
+- Validate `sigString` parameter in the `parseSignatureHeader` API.
 
 ### Added
 - Support for version 12 of the HTTP signature specification.
