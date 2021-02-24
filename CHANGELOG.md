@@ -3,8 +3,8 @@
 ## 2.0.0 -
 
 ### Fixed
-- Pseudo-headers `created` & `expires` must be unix time stamps or js Dates.
-- hs2019 does not hash signature string before signing a signature string.
+- Pseudo-headers `created` & `expires` must be unix time stamps or JavaScript Dates.
+- `hs2019` does not hash signature string before signing a signature string.
 
 ### Changed
 - Library throws if the signature parameter headers is a zero-length string.
@@ -12,12 +12,16 @@
 - Validate `sigString` parameter in the `parseSignatureHeader` API.
 
 ### Added
-- Support for version 12 of the HTTP signature specification.
+- Support for the
+  [Signing HTTP Messages](https://tools.ietf.org/html/draft-cavage-http-signatures-12)
+  version 12 specification.  Note that an updated
+  [version](https://tools.ietf.org/html/draft-ietf-httpbis-message-signatures)
+  is currently being developed.
 - Validators for `created` & `expires`.
 - Tests for `parseRequest`.
 - Tests for headers parameter order.
 - Tests for unrecognized parameters in a signature.
-- Jsdoc strings for library functions and methods.
+- JSDoc strings for library functions and methods.
 - Validation is algorithm specific in some cases.
 - Test browser support with karma.
 
