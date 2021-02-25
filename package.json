@@ -6,6 +6,9 @@
   "directories": {
     "lib": "lib"
   },
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "test": "npm run test-node",
     "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.js",
