@@ -1,6 +1,6 @@
 # http-signature-header
 
-## 2.0.0 -
+## 2.0.0 - 2021-02-25
 
 ### Fixed
 - Pseudo-headers `created` & `expires` must be unix time stamps or JavaScript Dates.
