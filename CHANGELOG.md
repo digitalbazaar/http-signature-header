@@ -1,5 +1,10 @@
 # http-signature-header
 
+## 2.0.1 - TBD
+
+### Added
+- A `files` entry to `package.json` to remove the dirs `test` & `bin` from npm releases.
+
 ## 2.0.0 - 2021-02-25
 
 ### Fixed
