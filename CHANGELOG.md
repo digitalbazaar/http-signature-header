@@ -1,5 +1,15 @@
 # http-signature-header
 
+## 2.1.0 -
+
+### Added
+- Support for headers that aren't HTTP Authentication headers such as `Signature` header.
+- Expanded test coverage to include Authentication & Signature headers.
+- Expanded test coverage to handle malformed signature parameters.
+
+### Removed
+- Outdated test files for integration tests.
+
 ## 2.0.1 - 2021-03-02
 
 ### Added
