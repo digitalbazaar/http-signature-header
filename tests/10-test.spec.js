@@ -974,6 +974,134 @@ describe('http-signature', () => {
           expect(error, 'error should exist').to.not.be.null;
           error.message.should.equal('keyId was not specified');
         });
+        it('rejects if keyId is empty', () => {
+          const date = now - 1;
+          const text = 'keyId="",' +
+            'headers="x-date host (request-target)",' +
+            `signature="mockSignature"`;
+          const request = {
+            headers: {
+              host: 'example.com:18443',
+              'x-date': new Date(date * 1000),
+              [scheme]: createHeaderString({text, scheme})
+            },
+            method: 'GET',
+            url: 'https://example.com:18443/1/2/3',
+          };
+          const expectedHeaders = ['host', '(request-target)'];
+          let error = null;
+          let result = null;
+          const options = {
+            headers: expectedHeaders,
+            authorizationHeaderName: scheme,
+            now
+          };
+          try {
+            result = httpSignatureHeader.parseRequest(request, options);
+          } catch(e) {
+            error = e;
+          }
+          expect(result, 'result should not exist').to.be.null;
+          expect(error, 'error should exist').to.not.be.null;
+          error.message.should.equal('keyId was not specified');
+        });
+
+        it('rejects if missing a comma between params', () => {
+          const date = now - 1;
+          const text = 'keyId="https://example.com/key/1"' +
+            'headers="x-date host (request-target)",' +
+            `signature="mockSignature"`;
+          const request = {
+            headers: {
+              host: 'example.com:18443',
+              'x-date': new Date(date * 1000),
+              [scheme]: createHeaderString({text, scheme})
+            },
+            method: 'GET',
+            url: 'https://example.com:18443/1/2/3',
+          };
+          const expectedHeaders = ['host', '(request-target)'];
+          let error = null;
+          let result = null;
+          const options = {
+            headers: expectedHeaders,
+            authorizationHeaderName: scheme,
+            now
+          };
+          try {
+            result = httpSignatureHeader.parseRequest(request, options);
+          } catch(e) {
+            error = e;
+          }
+          expect(result, 'result should not exist').to.be.null;
+          expect(error, 'error should exist').to.not.be.null;
+          error.message.should.equal('bad param format');
+        });
+
+        it('rejects if no qoutes around a value', () => {
+          const date = now - 1;
+          const text = 'keyId=https://example.com/key/1,' +
+            'headers="x-date host (request-target)",' +
+            `signature="mockSignature"`;
+          const request = {
+            headers: {
+              host: 'example.com:18443',
+              'x-date': new Date(date * 1000),
+              [scheme]: createHeaderString({text, scheme})
+            },
+            method: 'GET',
+            url: 'https://example.com:18443/1/2/3',
+          };
+          const expectedHeaders = ['host', '(request-target)'];
+          let error = null;
+          let result = null;
+          const options = {
+            headers: expectedHeaders,
+            authorizationHeaderName: scheme,
+            now
+          };
+          try {
+            result = httpSignatureHeader.parseRequest(request, options);
+          } catch(e) {
+            error = e;
+          }
+          expect(result, 'result should not exist').to.be.null;
+          expect(error, 'error should exist').to.not.be.null;
+          error.message.should.equal('bad param format');
+        });
+
+        it('rejects if there is a space between params', () => {
+          const date = now - 1;
+          const text = 'keyId="https://example.com/key/1",' +
+            'headers="x-date host (request-target)",' +
+            ` signature="mockSignature"`;
+          const request = {
+            headers: {
+              host: 'example.com:18443',
+              'x-date': new Date(date * 1000),
+              [scheme]: createHeaderString({text, scheme})
+            },
+            method: 'GET',
+            url: 'https://example.com:18443/1/2/3',
+          };
+          const expectedHeaders = ['host', '(request-target)'];
+          let error = null;
+          let result = null;
+          const options = {
+            headers: expectedHeaders,
+            authorizationHeaderName: scheme,
+            now
+          };
+          try {
+            result = httpSignatureHeader.parseRequest(request, options);
+          } catch(e) {
+            error = e;
+          }
+          expect(result, 'result should not exist').to.be.null;
+          expect(error, 'error should exist').to.not.be.null;
+          error.message.should.equal('bad param format');
+        });
+
         it('should ignore unrecognized signature parameters', () => {
           const created = Math.floor(Date.now() / 1000);
           // note: this test adds a single unrecognized signature parameter
