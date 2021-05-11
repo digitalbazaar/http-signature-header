@@ -3,8 +3,8 @@
 ## 2.1.0 -
 
 ### Added
-- Support for headers that aren't HTTP Authentication headers such as `Signature` header.
-- Expanded test coverage to include Authentication & Signature headers.
+- Support for headers that aren't HTTP Authorization headers such as `Signature` header.
+- Expanded test coverage to include Authorization & Signature headers.
 - Expanded test coverage to handle malformed signature parameters.
 
 ### Removed
