@@ -3,16 +3,20 @@
  */
 'use strict';
 
-const chai = require('chai');
-chai.should();
+import chai from 'chai';
+import {encodeDict} from 'structured-field-values';
+import httpSignatureHeader from '../lib';
+import HttpSignatureError from '../lib/HttpSignatureError';
 
+chai.should();
 const {expect} = chai;
-const httpSignatureHeader = require('../lib');
-const HttpSignatureError = require('../lib/HttpSignatureError');
 
 describe('http-signature', () => {
 
-  describe('createSignatureString API', () => {
+  describe('createSignatureInputString', () => {
+
+  });
+  describe.skip('createSignatureString API', () => {
     it('uses `date` header if specified', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
@@ -296,7 +300,7 @@ describe('http-signature', () => {
     });
   });
 
-  describe('createAuthzHeader API', () => {
+  describe.skip('createAuthzHeader API', () => {
     it('header with an algorithm and one specified header', () => {
       const authz = httpSignatureHeader.createAuthzHeader({
         algorithm: 'rsa-sha256',
@@ -454,7 +458,7 @@ describe('http-signature', () => {
     });
 
   });
-  describe('parseRequest API', function() {
+  describe.skip('parseRequest API', function() {
     // takes the result of parseRequest and tests it
     const shouldBeParsed = parsed => {
       parsed.should.have.property('params');
