@@ -4,7 +4,7 @@
 'use strict';
 
 import chai from 'chai';
-import {encodeDict} from 'structured-field-values';
+import {encodeList, Item} from 'structured-field-values';
 import httpSignatureHeader from '../lib/index.js';
 
 const {HttpSignatureError} = httpSignatureHeader;
@@ -14,7 +14,21 @@ const {expect} = chai;
 describe('http-signature', () => {
 
   describe('createSignatureInputString', () => {
-
+    it('uses `date` header if specified', () => {
+      const date = new Date().toUTCString();
+      const httpMessage = {
+        headers: {date},
+        method: 'GET',
+        url: 'https://example.com',
+        alg: ''
+      };
+      const signatureInput = new Item([new Item('date')]);
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput,
+        httpMessage
+      });
+console.log(stringToSign);
+    });
   });
   describe.skip('createSignatureString API', () => {
     it('uses `date` header if specified', () => {
