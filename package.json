@@ -34,6 +34,7 @@
   "homepage": "https://github.com/digitalbazaar/http-signature-header#readme",
   "dependencies": {
     "assert-plus": "^1.0.0",
+    "esm": "^3.2.25",
     "structured-field-values": "^1.0.0"
   },
   "devDependencies": {
