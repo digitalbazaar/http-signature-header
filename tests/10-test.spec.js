@@ -4,6 +4,7 @@
 'use strict';
 
 import chai from 'chai';
+import {signatureInputs, signatures} from './mockData.js';
 import {decodeDict, encodeList, encodeDict, Item} from 'structured-field-values';
 import httpSignatureHeader from '../lib/index.js';
 
@@ -21,13 +22,31 @@ describe('http-signature', () => {
         method: 'GET',
         url: 'https://example.com',
       };
-      const {sig1} = decodeDict('sig1=("date");keyid="foo";alg="bar"');
+      const {sig1} = decodeDict(signatureInputs.date);
       const stringToSign = httpSignatureHeader.createSignatureInputString({
         signatureInput: sig1,
         httpMessage
       });
-      console.log(stringToSign);
+      stringToSign.should.equal(`"date": ${date}\n` +
+        '"@signature-parameters": "date";keyid="foo";alg="bar"');
     });
+    it('properly encodes `@request-target` with root path', () => {
+      const date = new Date().toUTCString();
+      const httpMessage = {
+        headers: {date},
+        method: 'GET',
+        url: 'https://example.com',
+      };
+      const {sig1} = decodeDict(signatureInputs.requestTarget);
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      stringToSign.should.equal(`"date": ${date}\n"@request-target": get /` +
+        '\n"@signature-parameters": "date", "@request-target";keyid="foo"' +
+        ';alg="bar"');
+    });
+
   });
 /*
   describe.skip('createSignatureString API', () => {
@@ -41,17 +60,6 @@ describe('http-signature', () => {
       const stringToSign = httpSignatureHeader.createSignatureString(
         {includeHeaders: ['date'], requestOptions});
       stringToSign.should.equal(`date: ${date}`);
-    });
-    it('properly encodes `(request-target)` with root path', () => {
-      const date = new Date().toUTCString();
-      const requestOptions = {
-        headers: {date},
-        method: 'GET',
-        url: 'https://example.com',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['date', '(request-target)'], requestOptions});
-      stringToSign.should.equal(`date: ${date}\n(request-target): get /`);
     });
     it('properly encodes `(request-target)` with a path', () => {
       const date = new Date().toUTCString();
