@@ -5,9 +5,12 @@
 
 import chai from 'chai';
 import {encodeDict} from 'structured-field-values';
-import httpSignatureHeader from '../lib';
-import HttpSignatureError from '../lib/HttpSignatureError';
+import httpSignatureHeader from '../lib/index.js';
 
+
+console.log({httpSignatureHeader});
+
+const {HttpSignatureError} = httpSignatureHeader;
 chai.should();
 const {expect} = chai;
 

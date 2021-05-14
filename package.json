@@ -3,6 +3,7 @@
   "version": "2.0.2-0",
   "description": "",
   "main": "lib",
+  "type": "module",
   "directories": {
     "lib": "lib"
   },
@@ -11,7 +12,7 @@
   ],
   "scripts": {
     "test": "npm run test-node",
-    "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.js",
+    "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.mjs",
     "test-karma": "cross-env NODE_ENV=test karma start karma.conf.js",
     "benchmark": "node benchmark/benchmark.js",
     "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary npm run test-node",
@@ -33,7 +34,7 @@
   },
   "homepage": "https://github.com/digitalbazaar/http-signature-header#readme",
   "dependencies": {
-    "assert-plus": "^1.0.0",
+    "check-types": "^11.1.2",
     "esm": "^3.2.25",
     "structured-field-values": "^1.0.0"
   },
@@ -50,7 +51,7 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^4.0.2",
-    "mocha": "^6.0.0",
+    "mocha": "^8.4.0",
     "nyc": "^15.0.1",
     "uuid": "^3.2.1",
     "webpack": "^4.43.0"
