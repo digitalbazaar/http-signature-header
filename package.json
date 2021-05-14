@@ -35,7 +35,6 @@
   "homepage": "https://github.com/digitalbazaar/http-signature-header#readme",
   "dependencies": {
     "check-types": "^11.1.2",
-    "esm": "^3.2.25",
     "structured-field-values": "^1.0.0"
   },
   "devDependencies": {
@@ -57,7 +56,6 @@
     "webpack": "^4.43.0"
   },
   "browser": {
-    "assert-plus": false,
     "./lib/url.js": "./lib/url-browser.js"
   },
   "engines": {
