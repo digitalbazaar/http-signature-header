@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "npm run test-node",
-    "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.mjs",
+    "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.js",
     "test-karma": "cross-env NODE_ENV=test karma start karma.conf.js",
     "benchmark": "node benchmark/benchmark.js",
     "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary npm run test-node",
@@ -57,7 +57,8 @@
     "webpack": "^4.43.0"
   },
   "browser": {
-    "assert-plus": false
+    "assert-plus": false,
+    "./lib/url.js": "./lib/url-browser.js"
   },
   "engines": {
     "node": ">=8.6.0"

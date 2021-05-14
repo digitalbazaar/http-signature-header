@@ -4,11 +4,8 @@
 'use strict';
 
 import chai from 'chai';
-import {encodeDict} from 'structured-field-values';
+//import {encodeDict} from 'structured-field-values';
 import httpSignatureHeader from '../lib/index.js';
-
-
-console.log({httpSignatureHeader});
 
 const {HttpSignatureError} = httpSignatureHeader;
 chai.should();
