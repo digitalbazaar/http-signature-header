@@ -27,7 +27,7 @@ describe('http-signature', () => {
         signatureInput,
         httpMessage
       });
-console.log(stringToSign);
+      console.log(stringToSign);
     });
   });
   describe.skip('createSignatureString API', () => {
