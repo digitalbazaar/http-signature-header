@@ -28,7 +28,7 @@ describe('http-signature', () => {
         httpMessage
       });
       stringToSign.should.equal(`"date": ${date}\n` +
-        '"@signature-parameters": "date";keyid="foo";alg="bar"');
+        '"@signature-parameters": ("date");keyid="foo";alg="bar"');
     });
     it('properly encodes `@request-target` with root path', () => {
       const date = new Date().toUTCString();
@@ -43,35 +43,30 @@ describe('http-signature', () => {
         httpMessage
       });
       stringToSign.should.equal(`"date": ${date}\n"@request-target": get /` +
-        '\n"@signature-parameters": "date", "@request-target";keyid="foo"' +
+        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
         ';alg="bar"');
     });
-
-  });
-/*
-  describe.skip('createSignatureString API', () => {
-    it('uses `date` header if specified', () => {
+    it('properly encodes `@request-target` with a path', () => {
       const date = new Date().toUTCString();
-      const requestOptions = {
-        headers: {date},
-        method: 'GET',
-        url: 'https://example.com',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['date'], requestOptions});
-      stringToSign.should.equal(`date: ${date}`);
-    });
-    it('properly encodes `(request-target)` with a path', () => {
-      const date = new Date().toUTCString();
-      const requestOptions = {
+      const httpMessage = {
         headers: {date},
         method: 'GET',
         url: 'https://example.com/1/2/3',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['date', '(request-target)'], requestOptions});
-      stringToSign.should.equal(`date: ${date}\n(request-target): get /1/2/3`);
+      const {sig1} = decodeDict(signatureInputs.requestTarget);
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      stringToSign.should.equal(
+        `"date": ${date}\n"@request-target": get /1/2/3` +
+        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        ';alg="bar"'
+      );
     });
+  });
+/*
+  describe.skip('createSignatureString API', () => {
     it('properly encodes `(request-target)` with a relative path', () => {
       const date = new Date().toUTCString();
       const requestOptions = {
