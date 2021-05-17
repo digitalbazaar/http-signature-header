@@ -64,45 +64,65 @@ describe('http-signature', () => {
         ';alg="bar"'
       );
     });
-  });
-/*
-  describe.skip('createSignatureString API', () => {
-    it('properly encodes `(request-target)` with a relative path', () => {
+    it('properly encodes `@request-target` with a relative path', () => {
       const date = new Date().toUTCString();
-      const requestOptions = {
+      const httpMessage = {
         headers: {date},
         method: 'GET',
         url: '/relative/path',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['date', '(request-target)'], requestOptions});
+      const {sig1} = decodeDict(signatureInputs.requestTarget);
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
       stringToSign.should.equal(
-        `date: ${date}\n(request-target): get /relative/path`);
+        `"date": ${date}\n"@request-target": get /relative/path` +
+        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        ';alg="bar"'
+      );
     });
-    it('properly encodes `(request-target)` with post method', () => {
+    it('properly encodes `@request-target` with post method', () => {
       const date = new Date().toUTCString();
-      const requestOptions = {
+      const httpMessage = {
         headers: {date},
         method: 'POST',
         url: 'https://example.com',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['date', '(request-target)'], requestOptions});
-      stringToSign.should.equal(`date: ${date}\n(request-target): post /`);
+      const {sig1} = decodeDict(signatureInputs.requestTarget);
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      stringToSign.should.equal(
+        `"date": ${date}\n"@request-target": post /` +
+        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        ';alg="bar"'
+      );
     });
 
     it('properly encodes `host`', () => {
       const date = new Date().toUTCString();
-      const requestOptions = {
+      const httpMessage = {
         headers: {date},
         method: 'GET',
         url: 'https://example.com/1/2/3',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['host', 'date', '(request-target)'], requestOptions});
+      const {sig1} = decodeDict(signatureInputs.host);
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
       stringToSign.should.equal(
-        `host: example.com\ndate: ${date}\n(request-target): get /1/2/3`);
+        `"host": example.com\n"date": ${date}\n"@request-target": get /1/2/3` +
+        '\n"@signature-parameters": ("host" "date" "@request-target")' +
+        ';keyid="foo";alg="bar"'
+      );
     });
+
+  });
+/*
+  describe.skip('createSignatureString API', () => {
 
     it('properly encodes `host` with a port', () => {
       const date = new Date().toUTCString();
