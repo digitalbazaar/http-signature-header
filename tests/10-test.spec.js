@@ -198,6 +198,56 @@ describe('http-signature', () => {
         ';keyid="foo";alg="bar"'
       );
     });
+    it('properly encodes using header parameter order', () => {
+      const date = new Date().toUTCString();
+      const httpMessage = {
+        headers: {date},
+        method: 'GET',
+        url: 'https://example.com/1/2/3',
+      };
+      // 2 different signatures with the same parameters
+      // in a different order
+      const {sig1} = decodeDict(
+        'sig1=("host" "date" "@request-target");keyid="foo";alg="bar"');
+      const stringToSign1 = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      // the header parameters have the same value, but are in a different order
+      const {sig2} = decodeDict(
+        'sig2=("date" "host" "@request-target");keyid="foo";alg="bar"');
+      const stringToSign2 = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig2,
+        httpMessage
+      });
+      stringToSign2.should.not.equal(stringToSign1);
+    });
+
+    it('throws when an unknown header is specified', () => {
+      const date = new Date().toUTCString();
+      const httpMessage = {
+        headers: {date},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("foo" "date");keyid="foo";alg="bar"');
+      expect(() => httpSignatureHeader.createSignatureInputString(
+        {signatureInput: sig1, httpMessage}))
+        .to.throw(HttpSignatureError, `Failed to find header field name "foo"`);
+    });
+    it('throws when an invalid header is specified', () => {
+      const httpMessage = {
+        headers: {'(bad)': true},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("(bad)");keyid="foo";alg="bar"');
+      expect(() => httpSignatureHeader.createSignatureInputString(
+        {signatureInput: sig1, httpMessage}))
+        .to.throw(HttpSignatureError, /Illegal header "[A-z\(\)]+"/i);
+    });
   });
 /*
   describe.skip('createSignatureString API', () => {
@@ -312,52 +362,6 @@ describe('http-signature', () => {
         `${date}\n(request-target): get /1/2/3`);
     });
 
-    it('properly encodes using header parameter order', () => {
-      const date = new Date().toUTCString();
-      const requestOptions = {
-        headers: {date},
-        method: 'GET',
-        url: 'https://example.com/1/2/3',
-      };
-      // 2 different signatures with the same parameters
-      // in a different order
-      const firstString = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['host', 'date', '(request-target)'],
-          requestOptions});
-      firstString.should.equal(
-        `host: example.com\ndate: ${date}\n` +
-        `(request-target): get /1/2/3`);
-      // the header parameters have the same value, but are in a different order
-      const secondString = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['(request-target)', 'host', 'date'],
-          requestOptions});
-      secondString.should.not.equal(firstString);
-      secondString.should.equal(
-        `(request-target): get /1/2/3\nhost: example.com\ndate: ` +
-        `${date}`);
-    });
-
-    it('throws when an unknown header is specified', () => {
-      const date = new Date().toUTCString();
-      const requestOptions = {
-        headers: {date},
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      expect(() => httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['foo', 'date'], requestOptions}))
-        .to.throw(HttpSignatureError, /foo was not found/);
-    });
-    it('throws when an invalid header is specified', () => {
-      const requestOptions = {
-        headers: {'(bad)': true},
-        method: 'GET',
-        url: 'https://example.com:18443/1/2/3',
-      };
-      expect(() => httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['(bad)'], requestOptions}))
-        .to.throw(HttpSignatureError, /Illegal header "[A-z\(\)]+"/i);
-    });
   });
 
   describe.skip('createAuthzHeader API', () => {
