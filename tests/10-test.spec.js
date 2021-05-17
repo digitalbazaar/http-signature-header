@@ -119,65 +119,88 @@ describe('http-signature', () => {
         ';keyid="foo";alg="bar"'
       );
     });
-
-  });
-/*
-  describe.skip('createSignatureString API', () => {
-
     it('properly encodes `host` with a port', () => {
       const date = new Date().toUTCString();
-      const requestOptions = {
+      const httpMessage = {
         headers: {date},
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['host', 'date', '(request-target)'], requestOptions});
+      const {sig1} = decodeDict(signatureInputs.host);
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
       stringToSign.should.equal(
-        `host: example.com:18443\ndate: ${date}\n(request-target): get /1/2/3`);
+        `"host": example.com:18443\n"date": ${date}\n"@request-target": get /1/2/3` +
+        '\n"@signature-parameters": ("host" "date" "@request-target")' +
+        ';keyid="foo";alg="bar"'
+      );
     });
-
     it('properly encodes a header with a zero-length value', () => {
       const date = new Date().toUTCString();
       const zero = '';
-      const requestOptions = {
+      const httpMessage = {
         headers: {date, zero},
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['host', 'date', 'zero'], requestOptions});
+      const {sig1} = decodeDict(
+        'sig1=("host" "date" "zero");keyid="foo";alg="bar"');
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
       stringToSign.should.equal(
-        `host: example.com:18443\ndate: ${date}\nzero: `);
+        `"host": example.com:18443\n"date": ${date}\n"zero": ` +
+        '\n"@signature-parameters": ("host" "date" "zero")' +
+        ';keyid="foo";alg="bar"'
+      );
     });
 
     it('properly encodes a header that\'s value is all white spaces', () => {
       const date = new Date().toUTCString();
       const zero = '  ';
-      const requestOptions = {
+      const httpMessage = {
         headers: {date, zero},
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['host', 'date', 'zero'], requestOptions});
+      const {sig1} = decodeDict(
+        'sig1=("host" "date" "zero");keyid="foo";alg="bar"');
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
       stringToSign.should.equal(
-        `host: example.com:18443\ndate: ${date}\nzero: `);
+        `"host": example.com:18443\n"date": ${date}\n"zero": ` +
+        '\n"@signature-parameters": ("host" "date" "zero")' +
+        ';keyid="foo";alg="bar"'
+      );
     });
-
     it('properly encodes a header with multiple values', () => {
       const date = new Date().toUTCString();
       const multiple = 'true, false';
-      const requestOptions = {
+      const httpMessage = {
         headers: {date, multiple},
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['host', 'date', 'multiple'], requestOptions});
+      const {sig1} = decodeDict(
+        'sig1=("host" "date" "multiple");keyid="foo";alg="bar"');
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
       stringToSign.should.equal(
-        `host: example.com:18443\ndate: ${date}\nmultiple: true, false`);
+        `"host": example.com:18443\n"date": ${date}\n"multiple": true, false` +
+        '\n"@signature-parameters": ("host" "date" "multiple")' +
+        ';keyid="foo";alg="bar"'
+      );
     });
+  });
+/*
+  describe.skip('createSignatureString API', () => {
 
     it('properly encodes `(key-id)` with an iri', () => {
       const iri = 'https://example.com/key.pub';
