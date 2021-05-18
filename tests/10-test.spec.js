@@ -242,7 +242,7 @@ describe('http-signature', () => {
         {signatureInput: sig1, httpMessage}))
         .to.throw(Error, /failed to parse/i);
     });
-    it('throws when a content identifier has a key param but they key ' +
+    it('throws when a content identifier has a key param but the key ' +
       'is not found in the dictionary', () => {
       const date = new Date().toUTCString();
       const dictionary = 'test="foo"';
@@ -276,6 +276,37 @@ describe('http-signature', () => {
         '\n"@signature-parameters": ("date" "list";prefix=1)' +
         ';keyid="foo";alg="bar"'
       );
+    });
+
+    it('throws when a content identifier has a prefix param but ' +
+      'the header is not a list', () => {
+      const date = new Date().toUTCString();
+      const list = 'test="foo"';
+      const httpMessage = {
+        headers: {date, list},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "list";prefix=0);keyid="foo";alg="bar"');
+      expect(() => httpSignatureHeader.createSignatureInputString(
+        {signatureInput: sig1, httpMessage}))
+        .to.throw(Error, /Failed to parse/i);
+    });
+    it('throws when a content identifier has a prefix param but ' +
+      'the prefix is out of bounds', () => {
+      const date = new Date().toUTCString();
+      const list = '"foo", "bar"';
+      const httpMessage = {
+        headers: {date, list},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "list";prefix=3);keyid="foo";alg="bar"');
+      expect(() => httpSignatureHeader.createSignatureInputString(
+        {signatureInput: sig1, httpMessage}))
+        .to.throw(Error, /out of bounds/i);
     });
 
     it('properly encodes using header parameter order', () => {
