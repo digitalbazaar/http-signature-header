@@ -5,7 +5,7 @@
 
 import chai from 'chai';
 import {signatureInputs, signatures} from './mockData.js';
-import {decodeDict, encodeList, encodeDict, Item} from 'structured-field-values';
+import {decodeDict, encodeList, encodeDict, encodeItem, Item} from 'structured-field-values';
 import httpSignatureHeader from '../lib/index.js';
 
 const {HttpSignatureError} = httpSignatureHeader;
@@ -195,6 +195,26 @@ describe('http-signature', () => {
       stringToSign.should.equal(
         `"date": ${date}\n"multiple": true, false` +
         '\n"@signature-parameters": ("date" "multiple")' +
+        ';keyid="foo";alg="bar"'
+      );
+    });
+    it('properly encodes a header with a dictionary value', () => {
+      const date = new Date().toUTCString();
+      const dictionary = 'test="foo"';
+      const httpMessage = {
+        headers: {date, dictionary},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "dictionary";key="test");keyid="foo";alg="bar"');
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      stringToSign.should.equal(
+        `"date": ${date}\n"dictionary": foo` +
+        '\n"@signature-parameters": ("date" "dictionary";key="test")' +
         ';keyid="foo";alg="bar"'
       );
     });
