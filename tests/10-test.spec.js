@@ -5,7 +5,14 @@
 
 import chai from 'chai';
 import {signatureInputs, signatures} from './mockData.js';
-import {decodeDict, encodeList, encodeDict, encodeItem, Item} from 'structured-field-values';
+import {
+  decodeDict,
+  decodeList,
+  encodeList,
+  encodeDict,
+  encodeItem,
+  Item
+} from 'structured-field-values';
 import httpSignatureHeader from '../lib/index.js';
 
 const {HttpSignatureError} = httpSignatureHeader;
@@ -13,7 +20,6 @@ chai.should();
 const {expect} = chai;
 
 describe('http-signature', () => {
-
   describe('createSignatureInputString', () => {
     it('uses `date` header if specified', () => {
       const date = new Date().toUTCString();
@@ -218,6 +224,27 @@ describe('http-signature', () => {
         ';keyid="foo";alg="bar"'
       );
     });
+    it('properly encodes a header with a list value', () => {
+      const date = new Date().toUTCString();
+      const list = '"foo", "bar"';
+      const httpMessage = {
+        headers: {date, list},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "list";prefix=1);keyid="foo";alg="bar"');
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      stringToSign.should.equal(
+        `"date": ${date}\n"list": bar` +
+        '\n"@signature-parameters": ("date" "list";prefix=1)' +
+        ';keyid="foo";alg="bar"'
+      );
+    });
+
     it('properly encodes using header parameter order', () => {
       const date = new Date().toUTCString();
       const httpMessage = {
