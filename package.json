@@ -59,7 +59,7 @@
     "./lib/url.js": "./lib/url-browser.js"
   },
   "engines": {
-    "node": ">=8.6.0"
+    "node": ">=14.0.0"
   },
   "nyc": {
     "exclude": [
