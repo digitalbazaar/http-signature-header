@@ -104,7 +104,7 @@ describe('http-signature', () => {
     it('properly encodes `host`', () => {
       const date = new Date().toUTCString();
       const httpMessage = {
-        headers: {date},
+        headers: {date, host: 'example.com'},
         method: 'GET',
         url: 'https://example.com/1/2/3',
       };
@@ -122,7 +122,7 @@ describe('http-signature', () => {
     it('properly encodes `host` with a port', () => {
       const date = new Date().toUTCString();
       const httpMessage = {
-        headers: {date},
+        headers: {date, host: 'example.com:18443'},
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
@@ -132,8 +132,8 @@ describe('http-signature', () => {
         httpMessage
       });
       stringToSign.should.equal(
-        `"host": example.com:18443\n"date": ${date}\n"@request-target": get /1/2/3` +
-        '\n"@signature-parameters": ("host" "date" "@request-target")' +
+        `"host": example.com:18443\n"date": ${date}\n"@request-target": get ` +
+        '/1/2/3\n"@signature-parameters": ("host" "date" "@request-target")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -146,14 +146,14 @@ describe('http-signature', () => {
         url: 'https://example.com:18443/1/2/3',
       };
       const {sig1} = decodeDict(
-        'sig1=("host" "date" "zero");keyid="foo";alg="bar"');
+        'sig1=("date" "zero");keyid="foo";alg="bar"');
       const stringToSign = httpSignatureHeader.createSignatureInputString({
         signatureInput: sig1,
         httpMessage
       });
       stringToSign.should.equal(
-        `"host": example.com:18443\n"date": ${date}\n"zero": ` +
-        '\n"@signature-parameters": ("host" "date" "zero")' +
+        `"date": ${date}\n"zero": ` +
+        '\n"@signature-parameters": ("date" "zero")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -167,14 +167,14 @@ describe('http-signature', () => {
         url: 'https://example.com:18443/1/2/3',
       };
       const {sig1} = decodeDict(
-        'sig1=("host" "date" "zero");keyid="foo";alg="bar"');
+        'sig1=("date" "zero");keyid="foo";alg="bar"');
       const stringToSign = httpSignatureHeader.createSignatureInputString({
         signatureInput: sig1,
         httpMessage
       });
       stringToSign.should.equal(
-        `"host": example.com:18443\n"date": ${date}\n"zero": ` +
-        '\n"@signature-parameters": ("host" "date" "zero")' +
+        `"date": ${date}\n"zero": ` +
+        '\n"@signature-parameters": ("date" "zero")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -187,21 +187,21 @@ describe('http-signature', () => {
         url: 'https://example.com:18443/1/2/3',
       };
       const {sig1} = decodeDict(
-        'sig1=("host" "date" "multiple");keyid="foo";alg="bar"');
+        'sig1=("date" "multiple");keyid="foo";alg="bar"');
       const stringToSign = httpSignatureHeader.createSignatureInputString({
         signatureInput: sig1,
         httpMessage
       });
       stringToSign.should.equal(
-        `"host": example.com:18443\n"date": ${date}\n"multiple": true, false` +
-        '\n"@signature-parameters": ("host" "date" "multiple")' +
+        `"date": ${date}\n"multiple": true, false` +
+        '\n"@signature-parameters": ("date" "multiple")' +
         ';keyid="foo";alg="bar"'
       );
     });
     it('properly encodes using header parameter order', () => {
       const date = new Date().toUTCString();
       const httpMessage = {
-        headers: {date},
+        headers: {date, host: 'example.com'},
         method: 'GET',
         url: 'https://example.com/1/2/3',
       };
