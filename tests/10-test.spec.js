@@ -4,7 +4,10 @@
 'use strict';
 
 import chai from 'chai';
-import {signatureInputs, signatures} from './mockData.js';
+import {
+  signatureInputs,
+  signatures
+} from './mockData.js';
 import {
   decodeDict,
   decodeList,
@@ -223,6 +226,36 @@ describe('http-signature', () => {
         '\n"@signature-parameters": ("date" "dictionary";key="test")' +
         ';keyid="foo";alg="bar"'
       );
+    });
+    it('throws when a content identifier has a key param but header ' +
+      'is not a dictionary', () => {
+      const date = new Date().toUTCString();
+      const dictionary = '("foo")';
+      const httpMessage = {
+        headers: {date, dictionary},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "dictionary";key="test");keyid="foo";alg="bar"');
+      expect(() => httpSignatureHeader.createSignatureInputString(
+        {signatureInput: sig1, httpMessage}))
+        .to.throw(Error, /failed to parse/i);
+    });
+    it('throws when a content identifier has a key param but they key ' +
+      'is not found in the dictionary', () => {
+      const date = new Date().toUTCString();
+      const dictionary = 'test="foo"';
+      const httpMessage = {
+        headers: {date, dictionary},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "dictionary";key="bar");keyid="foo";alg="bar"');
+      expect(() => httpSignatureHeader.createSignatureInputString(
+        {signatureInput: sig1, httpMessage}))
+        .to.throw(HttpSignatureError, /Failed to find key/i);
     });
     it('properly encodes a header with a list value', () => {
       const date = new Date().toUTCString();
