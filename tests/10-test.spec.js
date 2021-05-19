@@ -6,15 +6,12 @@
 import chai from 'chai';
 import {
   signatureInputs,
-  signatures
+  signatures,
+  keys,
+  requests
 } from './mockData.js';
 import {
-  decodeDict,
-  decodeList,
-  encodeList,
-  encodeDict,
-  encodeItem,
-  Item
+  decodeDict
 } from 'structured-field-values';
 import httpSignatureHeader from '../lib/index.js';
 
@@ -403,7 +400,7 @@ describe('http-signature', () => {
         .to.throw(HttpSignatureError, /Illegal header "[A-z\(\)]+"/i);
     });
   });
-/*
+  /*
   describe.skip('createSignatureString API', () => {
 
     it('properly encodes `(key-id)` with an iri', () => {
@@ -517,166 +514,18 @@ describe('http-signature', () => {
     });
 
   });
-
-  describe.skip('createAuthzHeader API', () => {
-    it('header with an algorithm and one specified header', () => {
-      const authz = httpSignatureHeader.createAuthzHeader({
-        algorithm: 'rsa-sha256',
-        includeHeaders: ['date'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature'
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'algorithm="rsa-sha256",headers="date",signature="mockSignature"');
+*/
+  describe('parseRequest API', function() {
+    it('should match example one', async function() {
+      const request = {...requests.exampleOne};
+      request.headers['Signature-Input'] = signatureInputs.exampleOne;
+      request.headers.Signature = signatures.exampleOne;
+      const result = httpSignatureHeader.parseRequest(request);
+      console.log(result);
     });
-    it('header with an algorithm and two specified headers', () => {
-      const authz = httpSignatureHeader.createAuthzHeader({
-        algorithm: 'rsa-sha256',
-        includeHeaders: ['date', 'host'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature'
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'algorithm="rsa-sha256",headers="date host",signature="mockSignature"');
-    });
-    it('header with an algorithm and three specified headers', () => {
-      const authz = httpSignatureHeader.createAuthzHeader({
-        algorithm: 'rsa-sha256',
-        includeHeaders: ['date', 'host', '(request-target)'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature'
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'algorithm="rsa-sha256",headers="date host (request-target)",' +
-        'signature="mockSignature"');
-    });
-    it('header without an algorithm and one specified header', () => {
-      const authz = httpSignatureHeader.createAuthzHeader({
-        includeHeaders: ['date'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature'
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'headers="date",signature="mockSignature"');
-    });
-    it('header without an algorithm and two specified headers', () => {
-      const authz = httpSignatureHeader.createAuthzHeader({
-        includeHeaders: ['date', 'host'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature'
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'headers="date host",signature="mockSignature"');
-    });
-    it('header without an algorithm and three specified headers', () => {
-      const authz = httpSignatureHeader.createAuthzHeader({
-        includeHeaders: ['date', 'host', '(request-target)'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature'
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'headers="date host (request-target)",' +
-        'signature="mockSignature"');
-    });
-    it('header with integer (created)', () => {
-      const created = Math.floor(Date.now() / 1000);
-      const authz = httpSignatureHeader.createAuthzHeader({
-        includeHeaders: ['date', 'host', '(request-target)', '(created)'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature',
-        created
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'headers="date host (request-target) (created)",' +
-        `signature="mockSignature",created="${created}"`);
-    });
-    it('header with string (created)', () => {
-      const created = String(Math.floor(Date.now() / 1000));
-      const authz = httpSignatureHeader.createAuthzHeader({
-        includeHeaders: ['date', 'host', '(request-target)', '(created)'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature',
-        created
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'headers="date host (request-target) (created)",' +
-        `signature="mockSignature",created="${created}"`);
-    });
-    it('should throw if (created) is not a unix timestamp', () => {
-      const created = 'invalid-date-time';
-      let error = null;
-      let result = null;
-      try {
-        result = httpSignatureHeader.createAuthzHeader({
-          includeHeaders: ['date', 'host', '(request-target)', '(created)'],
-          keyId: 'https://example.com/key/1',
-          signature: 'mockSignature',
-          created
-        });
-      } catch(e) {
-        error = e;
-      }
-      expect(result).to.be.null;
-      expect(error).to.not.be.null;
-      error.message.should.equal(
-        '"created" must be a UNIX timestamp or JavaScript Date.');
-    });
-    it('header with integer (expires)', () => {
-      const expires = Math.floor(Date.now() / 1000);
-      const authz = httpSignatureHeader.createAuthzHeader({
-        includeHeaders: ['date', 'host', '(request-target)', '(expires)'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature',
-        expires
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'headers="date host (request-target) (expires)",' +
-        `signature="mockSignature",expires="${expires}"`);
-    });
-    it('header with string (expires)', () => {
-      const expires = String(Math.floor(Date.now() / 1000));
-      const authz = httpSignatureHeader.createAuthzHeader({
-        includeHeaders: ['date', 'host', '(request-target)', '(expires)'],
-        keyId: 'https://example.com/key/1',
-        signature: 'mockSignature',
-        expires
-      });
-      authz.should.be.a('string');
-      authz.should.equal('Signature keyId="https://example.com/key/1",' +
-        'headers="date host (request-target) (expires)",' +
-        `signature="mockSignature",expires="${expires}"`);
-    });
-    it('should throw if (expires) is not a unix timestamp', () => {
-      const expires = 'invalid-date-time';
-      let error = null;
-      let result = null;
-      try {
-        result = httpSignatureHeader.createAuthzHeader({
-          includeHeaders: ['date', 'host', '(request-target)', '(expires)'],
-          keyId: 'https://example.com/key/1',
-          signature: 'mockSignature',
-          expires
-        });
-      } catch(e) {
-        error = e;
-      }
-      expect(result).to.be.null;
-      expect(error).to.not.be.null;
-      error.message.should.equal(
-        '"expires" must be a UNIX timestamp or JavaScript Date.');
-    });
-
   });
-  describe.skip('parseRequest API', function() {
+/*
+  describe('parseRequest API', function() {
     // takes the result of parseRequest and tests it
     const shouldBeParsed = parsed => {
       parsed.should.have.property('params');

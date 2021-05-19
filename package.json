@@ -56,7 +56,8 @@
     "webpack": "^5.37.0"
   },
   "browser": {
-    "./lib/url.js": "./lib/url-browser.js"
+    "./lib/url.js": "./lib/url-browser.js",
+    "./tests/crypto.js": "./tests/crypto-browser.js"
   },
   "engines": {
     "node": ">=14.0.0"
