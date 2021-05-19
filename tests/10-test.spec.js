@@ -259,7 +259,7 @@ describe('http-signature', () => {
     });
     it('properly encodes a header with a list value', () => {
       const date = new Date().toUTCString();
-      const list = '"foo", "bar"';
+      const list = '("foo" "bar")';
       const httpMessage = {
         headers: {date, list},
         method: 'GET',
@@ -272,8 +272,51 @@ describe('http-signature', () => {
         httpMessage
       });
       stringToSign.should.equal(
-        `"date": ${date}\n"list": bar` +
+        `"date": ${date}\n"list": (foo)` +
         '\n"@signature-parameters": ("date" "list";prefix=1)' +
+        ';keyid="foo";alg="bar"'
+      );
+    });
+    it('properly encodes when a prefix parameter should return' +
+      ' multiple values', () => {
+      const date = new Date().toUTCString();
+      const list = '(1 2 3 4 5 6)';
+      const httpMessage = {
+        headers: {date, list},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "list";prefix=3);keyid="foo";alg="bar"');
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      stringToSign.should.equal(
+        `"date": ${date}\n"list": (1, 2, 3)` +
+        '\n"@signature-parameters": ("date" "list";prefix=3)' +
+        ';keyid="foo";alg="bar"'
+      );
+    });
+
+    it('properly encodes when a prefix parameter should return' +
+      ' no values', () => {
+      const date = new Date().toUTCString();
+      const list = '(1 2 3 4 5 6)';
+      const httpMessage = {
+        headers: {date, list},
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const {sig1} = decodeDict(
+        'sig1=("date" "list";prefix=0);keyid="foo";alg="bar"');
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        signatureInput: sig1,
+        httpMessage
+      });
+      stringToSign.should.equal(
+        `"date": ${date}\n"list": ()` +
+        '\n"@signature-parameters": ("date" "list";prefix=0)' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -296,7 +339,7 @@ describe('http-signature', () => {
     it('throws when a content identifier has a prefix param but ' +
       'the prefix is out of bounds', () => {
       const date = new Date().toUTCString();
-      const list = '"foo", "bar"';
+      const list = '("foo" "bar")';
       const httpMessage = {
         headers: {date, list},
         method: 'GET',
