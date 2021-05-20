@@ -20,6 +20,34 @@ chai.should();
 const {expect} = chai;
 
 describe('http-signature', () => {
+  describe('createSignatureInputHeader', () => {
+    const shouldBeAnFSDict = (actualDict, expectedDict) => {
+      expect(
+        actualDict, 'Expected dict to be a string').to.be.a('string');
+      actualDict.should.equal(expectedDict);
+      // should be able to parse it
+      const o = decodeDict(actualDict);
+      expect(o, 'expected decoded dict to be an object').to.be.an('object');
+    };
+    it('encode a single signature input with no covered content', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([['sig1', {coveredContent: []}]]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.empty);
+    });
+    it('encode a multiple signature inputs with no covered content', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([
+          ['sig1', {coveredContent: []}],
+          ['sig2', {coveredContent: []}]
+        ]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.multipleEmpty);
+    });
+
+  });
   describe('createSignatureInputString', () => {
     it('uses `date` header if specified', () => {
       const date = new Date().toUTCString();
