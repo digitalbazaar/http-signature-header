@@ -1,26 +1,25 @@
-## Functions
+<a name="module_http-signature-headers"></a>
 
-<dl>
-<dt><a href="#createSignatureInputString
-Takes in a strutured fields inner list containing a signatures inputs
-and outputs a string to be signed.">createSignatureInputString
-Takes in a strutured fields inner list containing a signatures inputs
-and outputs a string to be signed.(options)</a> ⇒ <code>string</code></dt>
-<dd></dd>
-<dt><a href="#parseRequest
-Takes in a request object and options and parses the signature inputs.">parseRequest
-Takes in a request object and options and parses the signature inputs.(request, [options])</a> ⇒ <code>Map.&lt;string, object&gt;</code></dt>
-<dd></dd>
-</dl>
+## http-signature-headers
 
-<a name="createSignatureInputString
+* [http-signature-headers](#module_http-signature-headers)
+    * [~createSignatureInputString
+Takes in a strutured fields inner list containing a signatures inputs
+and outputs a string to be signed.(options)](#module_http-signature-headers..createSignatureInputString
+Takes in a strutured fields inner list containing a signatures inputs
+and outputs a string to be signed.) ⇒ <code>string</code>
+    * [~parseRequest
+Takes in a request object and options and parses the signature inputs.(request, [options])](#module_http-signature-headers..parseRequest
+Takes in a request object and options and parses the signature inputs.) ⇒ <code>Map.&lt;string, object&gt;</code>
+
+<a name="module_http-signature-headers..createSignatureInputString
 Takes in a strutured fields inner list containing a signatures inputs
 and outputs a string to be signed."></a>
 
-## createSignatureInputString
+### http-signature-headers~createSignatureInputString
 Takes in a strutured fields inner list containing a signatures inputs
 and outputs a string to be signed.(options) ⇒ <code>string</code>
-**Kind**: global function  
+**Kind**: inner method of [<code>http-signature-headers</code>](#module_http-signature-headers)  
 **Returns**: <code>string</code> - The string to be signed.  
 
 | Param | Type | Description |
@@ -29,12 +28,12 @@ and outputs a string to be signed.(options) ⇒ <code>string</code>
 | options.signatureInput | <code>object</code> | A structured field dictionary. |
 | options.httpMessage | <code>object</code> | A request or response message. |
 
-<a name="parseRequest
+<a name="module_http-signature-headers..parseRequest
 Takes in a request object and options and parses the signature inputs."></a>
 
-## parseRequest
+### http-signature-headers~parseRequest
 Takes in a request object and options and parses the signature inputs.(request, [options]) ⇒ <code>Map.&lt;string, object&gt;</code>
-**Kind**: global function  
+**Kind**: inner method of [<code>http-signature-headers</code>](#module_http-signature-headers)  
 **Returns**: <code>Map.&lt;string, object&gt;</code> - A map with each signature as key & an object
   with the signature and signature inputs as properties.  
 
