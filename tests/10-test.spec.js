@@ -84,6 +84,48 @@ describe('http-signature', () => {
       });
       shouldBeAnFSDict(dict, signatureInputs.oneMultiple);
     });
+    it('encodes a single signature input with covered content' +
+      ' as Items with prefix params', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([
+          ['sig1', {coveredContent: [{value: 'one', params: {prefix: 3}}]}]
+        ]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.onePrefix);
+    });
+    it('encodes multiple signature inputs with covered content' +
+      ' as Items with prefix params', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([
+          ['sig1', {coveredContent: [{value: 'one', params: {prefix: 1}}]}],
+          ['sig2', {coveredContent: [{value: 'two', params: {prefix: 1}}]}]
+        ]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.multiplePrefix);
+    });
+    it('encodes a single signature input with covered content' +
+      ' as Items with key params', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([
+          ['sig1', {coveredContent: [{value: 'one', params: {key: 'one'}}]}]
+        ]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.oneKey);
+    });
+    it('encodes multiple signature inputs with covered content' +
+      ' as Items with key params', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([
+          ['sig1', {coveredContent: [{value: 'one', params: {key: 'one'}}]}],
+          ['sig2', {coveredContent: [{value: 'two', params: {key: 'two'}}]}]
+        ]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.multipleKey);
+    });
 
   });
   describe('createSignatureInputString', () => {

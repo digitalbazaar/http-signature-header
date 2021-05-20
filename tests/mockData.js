@@ -10,6 +10,12 @@ export const signatureInputs = {
   multipleEmpty: 'sig1=();alg="foo", sig2=();alg="foo"',
   one: 'sig1=("one");alg="foo"',
   oneMultiple: 'sig1=("one");alg="foo", sig2=("two");alg="foo"',
+  onePrefix: 'sig1=("one";prefix=3);alg="foo"',
+  multiplePrefix: 'sig1=("one";prefix=1);alg="foo", sig2=("two";' +
+  'prefix=1);alg="foo"',
+  oneKey: 'sig1=("one";key="one");alg="foo"',
+  multipleKey: 'sig1=("one";key="one");alg="foo", sig2=("two";' +
+    'key="two");alg="foo"'
 };
 
 export const signatures = {

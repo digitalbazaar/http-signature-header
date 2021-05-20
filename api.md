@@ -1,43 +1,34 @@
-## Functions
+<a name="module_http-signature-headers"></a>
 
-<dl>
-<dt><a href="#createSignatureInputHeader
+## http-signature-headers
 
-Takes in a Map of signature inputs and outputs an sf dictionary header.">createSignatureInputHeader
+* [http-signature-headers](#module_http-signature-headers)
+    * [~createSignatureInputHeader
 
-Takes in a Map of signature inputs and outputs an sf dictionary header.(options)</a> ⇒ <code>string</code></dt>
-<dd></dd>
-<dt><a href="#createSignatureInputString
+Takes in a Map of signature inputs and outputs an sf dictionary header.(options)](#module_http-signature-headers..createSignatureInputHeader
 
-Takes in a strutured fields inner list containing a signatures inputs
-and outputs a string to be signed.">createSignatureInputString
+Takes in a Map of signature inputs and outputs an sf dictionary header.) ⇒ <code>string</code>
+    * [~createSignatureInputString
 
 Takes in a strutured fields inner list containing a signatures inputs
-and outputs a string to be signed.(options)</a> ⇒ <code>string</code></dt>
-<dd></dd>
-<dt><a href="#parseRequest
-Takes in a request object and options and parses the signature inputs.">parseRequest
-Takes in a request object and options and parses the signature inputs.(request, [options])</a> ⇒ <code>Map.&lt;string, object&gt;</code></dt>
-<dd></dd>
-</dl>
+and outputs a string to be signed.(options)](#module_http-signature-headers..createSignatureInputString
 
-## Typedefs
+Takes in a strutured fields inner list containing a signatures inputs
+and outputs a string to be signed.) ⇒ <code>string</code>
+    * [~parseRequest
+Takes in a request object and options and parses the signature inputs.(request, [options])](#module_http-signature-headers..parseRequest
+Takes in a request object and options and parses the signature inputs.) ⇒ <code>Map.&lt;string, object&gt;</code>
+    * [~Item](#module_http-signature-headers..Item) : <code>object</code>
+    * [~SignatureInput](#module_http-signature-headers..SignatureInput) : <code>object</code>
 
-<dl>
-<dt><a href="#Item">Item</a> : <code>object</code></dt>
-<dd></dd>
-<dt><a href="#SignatureInput">SignatureInput</a> : <code>object</code></dt>
-<dd></dd>
-</dl>
-
-<a name="createSignatureInputHeader
+<a name="module_http-signature-headers..createSignatureInputHeader
 
 Takes in a Map of signature inputs and outputs an sf dictionary header."></a>
 
-## createSignatureInputHeader
+### http-signature-headers~createSignatureInputHeader
 
 Takes in a Map of signature inputs and outputs an sf dictionary header.(options) ⇒ <code>string</code>
-**Kind**: global function  
+**Kind**: inner method of [<code>http-signature-headers</code>](#module_http-signature-headers)  
 **Returns**: <code>string</code> - A valid structured field dictionary header.  
 
 | Param | Type | Description |
@@ -46,16 +37,16 @@ Takes in a Map of signature inputs and outputs an sf dictionary header.(options)
 | options.signatures | <code>Map.&lt;string, SignatureInput&gt;</code> | A map with a key    containing the sig name & a SignatureInput. |
 | options.params | <code>object</code> | An object with global params  for each signature input such as `created`. |
 
-<a name="createSignatureInputString
+<a name="module_http-signature-headers..createSignatureInputString
 
 Takes in a strutured fields inner list containing a signatures inputs
 and outputs a string to be signed."></a>
 
-## createSignatureInputString
+### http-signature-headers~createSignatureInputString
 
 Takes in a strutured fields inner list containing a signatures inputs
 and outputs a string to be signed.(options) ⇒ <code>string</code>
-**Kind**: global function  
+**Kind**: inner method of [<code>http-signature-headers</code>](#module_http-signature-headers)  
 **Returns**: <code>string</code> - The string to be signed.  
 
 | Param | Type | Description |
@@ -64,12 +55,12 @@ and outputs a string to be signed.(options) ⇒ <code>string</code>
 | options.signatureInput | <code>object</code> | A structured field dictionary. |
 | options.httpMessage | <code>object</code> | A request or response message. |
 
-<a name="parseRequest
+<a name="module_http-signature-headers..parseRequest
 Takes in a request object and options and parses the signature inputs."></a>
 
-## parseRequest
+### http-signature-headers~parseRequest
 Takes in a request object and options and parses the signature inputs.(request, [options]) ⇒ <code>Map.&lt;string, object&gt;</code>
-**Kind**: global function  
+**Kind**: inner method of [<code>http-signature-headers</code>](#module_http-signature-headers)  
 **Returns**: <code>Map.&lt;string, object&gt;</code> - A map with each signature as key & an object
   with the signature and signature inputs as properties.  
 
@@ -78,10 +69,10 @@ Takes in a request object and options and parses the signature inputs.(request, 
 | request | <code>object</code> |  | A request object. |
 | [options] | <code>object</code> | <code>{}</code> | Options for parsing such as clockSkew. |
 
-<a name="Item"></a>
+<a name="module_http-signature-headers..Item"></a>
 
-## Item : <code>object</code>
-**Kind**: global typedef  
+### http-signature-headers~Item : <code>object</code>
+**Kind**: inner typedef of [<code>http-signature-headers</code>](#module_http-signature-headers)  
 **Properties**
 
 | Name | Type | Description |
@@ -89,10 +80,10 @@ Takes in a request object and options and parses the signature inputs.(request, 
 | params | <code>object</code> | Params for an item such as `key`. |
 | value | <code>string</code> | The header field name or  speciality content identifier. |
 
-<a name="SignatureInput"></a>
+<a name="module_http-signature-headers..SignatureInput"></a>
 
-## SignatureInput : <code>object</code>
-**Kind**: global typedef  
+### http-signature-headers~SignatureInput : <code>object</code>
+**Kind**: inner typedef of [<code>http-signature-headers</code>](#module_http-signature-headers)  
 **Properties**
 
 | Name | Type | Description |
