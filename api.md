@@ -1,7 +1,7 @@
-## Classes
+## Objects
 
 <dl>
-<dt><a href="#http-signature-headers">http-signature-headers</a></dt>
+<dt><a href="#http-signature-header">http-signature-header</a> : <code>object</code></dt>
 <dd></dd>
 </dl>
 
@@ -45,10 +45,10 @@ Takes in a request object and options and parses the signature inputs.(request, 
 <dd></dd>
 </dl>
 
-<a name="http-signature-headers"></a>
+<a name="http-signature-header"></a>
 
-## http-signature-headers
-**Kind**: global class  
+## http-signature-header : <code>object</code>
+**Kind**: global namespace  
 <a name="createSignatureHeader
 Takes in an object with keys as signature names and values Uint8Arrays.
 The Uint8Array should be the result of signing the signatureInput string."></a>
@@ -57,7 +57,14 @@ The Uint8Array should be the result of signing the signatureInput string."></a>
 Takes in an object with keys as signature names and values Uint8Arrays.
 The Uint8Array should be the result of signing the signatureInput string.(signatures) ⇒ <code>string</code>
 **Kind**: global function  
-**Returns**: <code>string</code> - An FS encoded dictionary with the sig values.  
+**Returns**: <code>string</code> - An FS encoded dictionary with  sigs as SF Byte sequences.  
+**See**
+
+- [https://datatracker.ietf.org/doc/html/rfc8941#section-3.2](https://datatracker.ietf.org/doc/html/rfc8941#section-3.2)
+For dictionaries.
+- [https://datatracker.ietf.org/doc/html/rfc8941#section-3.3.5](https://datatracker.ietf.org/doc/html/rfc8941#section-3.3.5)
+for Byte sequences.
+
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -72,6 +79,8 @@ Takes in a Map of signature inputs and outputs an sf dictionary header."></a>
 Takes in a Map of signature inputs and outputs an sf dictionary header.(options) ⇒ <code>string</code>
 **Kind**: global function  
 **Returns**: <code>string</code> - A valid structured field dictionary header.  
+**See**: [https://datatracker.ietf.org/doc/html/rfc8941#section-3.2](https://datatracker.ietf.org/doc/html/rfc8941#section-3.2)
+For dictionaries.  
 
 | Param | Type | Description |
 | --- | --- | --- |
