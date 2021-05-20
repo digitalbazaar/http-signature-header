@@ -32,26 +32,7 @@ npm install
 
 ## Usage
 
-```js
-const {createAuthzHeader, createSignatureString} = require('http-signature-header');
-
-const requestOptions = {
-  url,
-  method: 'POST',
-  headers
-}
-const includeHeaders = ['expires', 'host', '(request-target)'];
-const plaintext = createSignatureString({includeHeaders, requestOptions});
-
-const data = new TextEncoder().encode(plaintext);
-const signature = base64url.encode(await signer.sign({data}));
-
-const Authorization = createAuthzHeader({
-  includeHeaders,
-  keyId: signer.id,
-  signature
-});
-```
+[See `api.md`](https://github.com/digitalbazaar/http-signature-header/blob/master/api.md)
 
 ## Contribute
 

@@ -18,7 +18,8 @@
     "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary npm run test-node",
     "coverage-ci": "cross-env NODE_ENV=test nyc --reporter=text-lcov npm run test-node > coverage.lcov",
     "coverage-report": "nyc report",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "generate-docs": "npx jsdoc2md ./lib/*.js > api.md"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "eslint": "^7.20.0",
     "eslint-config-digitalbazaar": "^2.6.1",
     "eslint-plugin-jsdoc": "^32.2.0",
+    "jsdoc-to-markdown": "^7.0.1",
     "karma": "^6.3.2",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",

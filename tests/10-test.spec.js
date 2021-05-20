@@ -13,7 +13,7 @@ import {
 import {
   decodeDict
 } from 'structured-field-values';
-import httpSignatureHeader from '../lib/index.js';
+import * as httpSignatureHeader from '../lib/index.js';
 
 const {HttpSignatureError} = httpSignatureHeader;
 chai.should();
