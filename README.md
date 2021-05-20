@@ -40,7 +40,8 @@ Those headers are:
 `Signature` A structured field field dictionary in which each entry is contains a Binary Sequence
 
 
-Example: ```
+Example: 
+```
 X-Forwarded-For: 192.0.2.123
 Signature-Input: sig1=("@request-target" "host" "date" "cache-control" \
     "x-empty-header" "x-example");created=1618884475\
@@ -65,7 +66,8 @@ You can make those headers by using the functions `createSignatureInputHeader` a
 
 `createSignatureInputHeader` takes a Map and turns that Map into a `Signature-Input` header.
 
-example: ```js
+example: 
+```js
 const dict = httpSignatureHeader.createSignatureInputHeader({
   // here we have 1 signatures for the request
   signatures: new Map([
@@ -79,7 +81,8 @@ console.log(dict);
 //sig1=("one");alg="foo"
 ```
 
-example: ```js
+example: 
+```js
 const dict = httpSignatureHeader.createSignatureInputHeader({
   // here we have 2 signatures for the request
   signatures: new Map([
@@ -93,7 +96,8 @@ console.log(dict);
 // this is a valid `Signature-Input` header:
 //sig1=("one");alg="foo", sig2=("two");alg="foo"
 ```
-example: ```js
+example: 
+```js
 const dict = httpSignatureHeader.createSignatureInputHeader({
   // here we have 2 signatures for the request
   signatures: new Map([
@@ -132,7 +136,8 @@ const signature = await invocationSigner.sign({data});
 `createSignatureHeader` is much easier. Sign the signing string for your signature
 and pass it as a `Uint8Array`.
 
-example: ```js
+example: 
+```js
 const signature = new Uint8Array([1, 2, 3])
 const sigs = {sig1: signature};
 const dict = httpSignatureHeader.createSignatureHeader(sigs);
