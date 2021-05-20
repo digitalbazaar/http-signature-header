@@ -8,11 +8,9 @@
 ## Functions
 
 <dl>
-<dt><a href="#createSignatureHeader
+<dt><a href="#http-signature-headers
 Takes in an object with keys as signature names and values Uint8Arrays.
-The Uint8Array should be the result of signing the signatureInput string.">createSignatureHeader
-Takes in an object with keys as signature names and values Uint8Arrays.
-The Uint8Array should be the result of signing the signatureInput string.(signatures)</a> ⇒ <code>string</code></dt>
+The Uint8Array should be the result of signing the signatureInput string.createSignatureHeader">createSignatureHeader(signatures)</a> ⇒ <code>string</code></dt>
 <dd></dd>
 <dt><a href="#createSignatureInputHeader
 
@@ -47,20 +45,6 @@ Takes in a request object and options and parses the signature inputs.(request, 
 
 ## http-signature-headers
 **Kind**: global class  
-<a name="createSignatureHeader
-Takes in an object with keys as signature names and values Uint8Arrays.
-The Uint8Array should be the result of signing the signatureInput string."></a>
-
-## createSignatureHeader
-Takes in an object with keys as signature names and values Uint8Arrays.
-The Uint8Array should be the result of signing the signatureInput string.(signatures) ⇒ <code>string</code>
-**Kind**: global function  
-**Returns**: <code>string</code> - An FS encoded dictionary with the sig values.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| signatures | <code>object.&lt;string, Uint8Array&gt;</code> | An object with keys equal  to the signature name & the signature as a Uint8Array. |
-
 <a name="createSignatureInputHeader
 
 Takes in a Map of signature inputs and outputs an sf dictionary header."></a>
