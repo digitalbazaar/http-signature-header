@@ -5,6 +5,14 @@
 <dd></dd>
 </dl>
 
+## Constants
+
+<dl>
+<dt><a href="#convertToSFInnerList">convertToSFInnerList</a> ⇒ <code><a href="#Item">Item</a></code></dt>
+<dd><p>Converts coveredContent &amp; params to SF Items.</p>
+</dd>
+</dl>
+
 ## Functions
 
 <dl>
@@ -49,6 +57,20 @@ Takes in a request object and options and parses the signature inputs.(request, 
 
 ## http-signature-header : <code>object</code>
 **Kind**: global namespace  
+<a name="convertToSFInnerList"></a>
+
+## convertToSFInnerList ⇒ [<code>Item</code>](#Item)
+Converts coveredContent & params to SF Items.
+
+**Kind**: global constant  
+**Returns**: [<code>Item</code>](#Item) - SF Items for signing and string construction.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> | Options to use. |
+| options.coveredContent | <code>Array.&lt;(string\|Item)&gt;</code> | An array of content ids. |
+| options.params | <code>object</code> | Parameters for the inner list itself. |
+
 <a name="createSignatureHeader
 Takes in an object with keys as signature names and values Uint8Arrays.
 The Uint8Array should be the result of signing the signatureInput string."></a>
