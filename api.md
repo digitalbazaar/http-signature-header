@@ -3,7 +3,6 @@
 ## http-signature-headers
 
 * [http-signature-headers](#module_http-signature-headers)
-    * [~_getHeaderValue(options)](#module_http-signature-headers.._getHeaderValue) ⇒ <code>string</code>
     * [~createSignatureInputHeader
 
 Takes in a Map of signature inputs and outputs an sf dictionary header.(options)](#module_http-signature-headers..createSignatureInputHeader
@@ -20,21 +19,6 @@ and outputs a string to be signed.) ⇒ <code>string</code>
 Takes in a request object and options and parses the signature inputs.(request, [options])](#module_http-signature-headers..parseRequest
 Takes in a request object and options and parses the signature inputs.) ⇒ <code>Map.&lt;string, object&gt;</code>
     * [~SignatureInput](#module_http-signature-headers..SignatureInput) : <code>object</code>
-
-<a name="module_http-signature-headers.._getHeaderValue"></a>
-
-### http-signature-headers~\_getHeaderValue(options) ⇒ <code>string</code>
-Provides compatibilty with various ways of getting header values
-such as fetch's `header.get` method.
-
-**Kind**: inner method of [<code>http-signature-headers</code>](#module_http-signature-headers)  
-**Returns**: <code>string</code> - The header field value.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| options | <code>object</code> | Options to use. |
-| options.fieldName | <code>string</code> | A Header Field Name. |
-| options.request | <code>object</code> | A request object. |
 
 <a name="module_http-signature-headers..createSignatureInputHeader
 
@@ -101,5 +85,5 @@ Takes in a request object and options and parses the signature inputs.(request, 
 | Name | Type | Description |
 | --- | --- | --- |
 | params | <code>object</code> | Params for the Signature such as `alg`. |
-| coveredContent | <code>Array.&lt;(Item\|string)&gt;</code> | An array of strings or sf Items    expected in the headers of speciality content fields. |
+| coveredContent | <code>Array.&lt;(Item\|string)&gt;</code> | An array of strings or  sf Items expected in the headers of speciality content fields. |
 
