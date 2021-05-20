@@ -9,10 +9,6 @@
 
 <dl>
 <dt><a href="#http-signature-headers
-Takes in an object with keys as signature names and values Uint8Arrays.
-The Uint8Array should be the result of signing the signatureInput string.createSignatureHeader">createSignatureHeader(signatures)</a> ⇒ <code>string</code></dt>
-<dd></dd>
-<dt><a href="#http-signature-headers
 
 Takes in a Map of signature inputs and outputs an sf dictionary header.createSignatureInputHeader">createSignatureInputHeader(options)</a> ⇒ <code>string</code></dt>
 <dd></dd>
