@@ -4,22 +4,36 @@
 'use strict';
 
 import chai from 'chai';
+import {decodeDict} from 'structured-field-values';
+import * as httpSignatureHeader from '../lib/index.js';
 import {
   signatureInputs,
   signatures,
-  keys,
   requests
 } from './mockData.js';
-import {
-  decodeDict
-} from 'structured-field-values';
-import * as httpSignatureHeader from '../lib/index.js';
 
 const {HttpSignatureError} = httpSignatureHeader;
 chai.should();
 const {expect} = chai;
 
 describe('http-signature', () => {
+  describe('createSignatureHeader', () => {
+    it('should create a dictionary with one signature', () => {
+      const sigs = {sig1: new Uint8Array([1, 2, 3])};
+      const dict = httpSignatureHeader.createSignatureHeader(sigs);
+      expect(dict).to.be.a('string');
+      dict.should.be.equal('sig1=:AQID:');
+    });
+    it('should create a dictionary with multiple signatures', () => {
+      const sigs = {
+        sig1: new Uint8Array([1, 2, 3]),
+        sig2: new Uint8Array([4, 5, 6])
+      };
+      const dict = httpSignatureHeader.createSignatureHeader(sigs);
+      expect(dict).to.be.a('string');
+      dict.should.be.equal('sig1=:AQID:, sig2=:BAUG:');
+    });
+  });
   describe('createSignatureInputHeader', () => {
     const shouldBeAnFSDict = (actualDict, expectedDict) => {
       expect(
@@ -280,8 +294,7 @@ describe('http-signature', () => {
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const {sig1} = decodeDict(
-        'sig1=("date" "zero");keyid="foo";alg="bar"');
+      const {sig1} = decodeDict(signatureInputs.zero);
       const stringToSign = httpSignatureHeader.createSignatureInputString({
         signatureInput: sig1,
         httpMessage
@@ -300,8 +313,7 @@ describe('http-signature', () => {
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const {sig1} = decodeDict(
-        'sig1=("date" "multiple");keyid="foo";alg="bar"');
+      const {sig1} = decodeDict(signatureInputs.multipleValues);
       const stringToSign = httpSignatureHeader.createSignatureInputString({
         signatureInput: sig1,
         httpMessage
@@ -320,8 +332,7 @@ describe('http-signature', () => {
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const {sig1} = decodeDict(
-        'sig1=("date" "dictionary";key="test");keyid="foo";alg="bar"');
+      const {sig1} = decodeDict(signatureInputs.dict);
       const stringToSign = httpSignatureHeader.createSignatureInputString({
         signatureInput: sig1,
         httpMessage
@@ -341,8 +352,7 @@ describe('http-signature', () => {
         method: 'GET',
         url: 'https://example.com:18443/1/2/3',
       };
-      const {sig1} = decodeDict(
-        'sig1=("date" "dictionary";key="test");keyid="foo";alg="bar"');
+      const {sig1} = decodeDict(signatureInputs.dict);
       expect(() => httpSignatureHeader.createSignatureInputString(
         {signatureInput: sig1, httpMessage}))
         .to.throw(Error, /failed to parse/i);
@@ -605,31 +615,17 @@ describe('http-signature', () => {
       });
 
     }
-
-    it('properly encodes a header with multiple values', () => {
-      const date = new Date().toUTCString();
-      const requestOptions = {
-        headers: {date, 'x-custom': ['val1', 'val2']},
-        method: 'GET',
-        url: 'https://example.com/1/2/3',
-      };
-      const stringToSign = httpSignatureHeader.createSignatureString(
-        {includeHeaders: ['x-custom', 'host', 'date', '(request-target)'],
-          requestOptions});
-      stringToSign.should.equal(
-        `x-custom: val1, val2\nhost: example.com\ndate: ` +
-        `${date}\n(request-target): get /1/2/3`);
-    });
-
   });
 */
   describe('parseRequest API', function() {
-    it('should match example one', async function() {
+    it('should parse a Signature with no covered content', () => {
       const request = {...requests.exampleOne};
       request.headers['Signature-Input'] = signatureInputs.exampleOne;
       request.headers.Signature = signatures.exampleOne;
       const result = httpSignatureHeader.parseRequest(request);
-      console.log(result);
+      expect(result).to.be.a('Map');
+      const sig1 = result.get('sig1');
+      console.log(sig1);
     });
   });
 /*

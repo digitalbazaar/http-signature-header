@@ -34,7 +34,7 @@ Takes in an object with key sig name value signed signing string.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| signatures | <code>object</code> | An object with signatures. |
+| signatures | <code>object.&lt;string, Uint8Array&gt;</code> | An object with keys equal  to the signature name & the signature as a Uint8Array. |
 
 <a name="module_http-signature-headers..createSignatureInputHeader
 
@@ -50,7 +50,7 @@ Takes in a Map of signature inputs and outputs an sf dictionary header.(options)
 | --- | --- | --- |
 | options | <code>object</code> | Options to use. |
 | options.signatures | <code>Map.&lt;string, SignatureInput&gt;</code> | A map with a key    containing the sig name & a SignatureInput. |
-| options.params | <code>object</code> | An object with global params  for each signature input such as `created`. |
+| options.params | <code>object</code> | An object with global params  for each signature input such as created. |
 
 <a name="module_http-signature-headers..createSignatureInputString
 

@@ -15,7 +15,10 @@ export const signatureInputs = {
   'prefix=1);alg="foo"',
   oneKey: 'sig1=("one";key="one");alg="foo"',
   multipleKey: 'sig1=("one";key="one");alg="foo", sig2=("two";' +
-    'key="two");alg="foo"'
+    'key="two");alg="foo"',
+  zero: 'sig1=("date" "zero");keyid="foo";alg="bar"',
+  multipleValues: 'sig1=("date" "multiple");keyid="foo";alg="bar"',
+  dict: 'sig1=("date" "dictionary";key="test");keyid="foo";alg="bar"',
 };
 
 export const signatures = {
