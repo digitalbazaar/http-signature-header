@@ -203,7 +203,7 @@ console.log(sig1);
 */
 ```
 
-[See `api.md`](https://github.com/digitalbazaar/http-signature-header/blob/master/api.md)
+[See `api.md` for more documentation](https://github.com/digitalbazaar/http-signature-header/blob/master/api.md)
 
 ## Contribute
 
