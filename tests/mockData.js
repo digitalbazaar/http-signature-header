@@ -5,7 +5,11 @@ export const signatureInputs = {
   host: 'sig1=("host" "date" "@request-target")' +
     ';keyid="foo";alg="bar"',
   exampleOne: 'sig1=();created=1618884475;' +
-    'keyid="test-key-rsa-pss";alg="rsa-pss-sha512"'
+    'keyid="test-key-rsa-pss";alg="rsa-pss-sha512"',
+  empty: 'sig1=();alg="foo"',
+  multipleEmpty: 'sig1=();alg="foo", sig2=();alg="foo"',
+  one: 'sig1=("one");alg="foo"',
+  oneMultiple: 'sig1=("one");alg="foo", sig2=("two");alg="foo"',
 };
 
 export const signatures = {

@@ -29,14 +29,14 @@ describe('http-signature', () => {
       const o = decodeDict(actualDict);
       expect(o, 'expected decoded dict to be an object').to.be.an('object');
     };
-    it('encode a single signature input with no covered content', () => {
+    it('encodes a single signature input with no covered content', () => {
       const dict = httpSignatureHeader.createSignatureInputHeader({
         signatures: new Map([['sig1', {coveredContent: []}]]),
         params: {alg: 'foo'}
       });
       shouldBeAnFSDict(dict, signatureInputs.empty);
     });
-    it('encode a multiple signature inputs with no covered content', () => {
+    it('encodes multiple signature inputs with no covered content', () => {
       const dict = httpSignatureHeader.createSignatureInputHeader({
         signatures: new Map([
           ['sig1', {coveredContent: []}],
@@ -45,6 +45,44 @@ describe('http-signature', () => {
         params: {alg: 'foo'}
       });
       shouldBeAnFSDict(dict, signatureInputs.multipleEmpty);
+    });
+    it('encodes a single signature input with covered content' +
+      ' as strings', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([['sig1', {coveredContent: ['one']}]]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.one);
+    });
+    it('encodes multiple signature inputs with covered content' +
+      ' as strings', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([
+          ['sig1', {coveredContent: ['one']}],
+          ['sig2', {coveredContent: ['two']}]
+        ]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.oneMultiple);
+    });
+    it('encodes a single signature input with covered content' +
+      ' as Items with no params', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([['sig1', {coveredContent: [{value: 'one'}]}]]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.one);
+    });
+    it('encodes multiple signature inputs with covered content' +
+      ' as Items with no params', () => {
+      const dict = httpSignatureHeader.createSignatureInputHeader({
+        signatures: new Map([
+          ['sig1', {coveredContent: [{value: 'one'}]}],
+          ['sig2', {coveredContent: [{value: 'two'}]}]
+        ]),
+        params: {alg: 'foo'}
+      });
+      shouldBeAnFSDict(dict, signatureInputs.oneMultiple);
     });
 
   });
