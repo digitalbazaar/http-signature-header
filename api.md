@@ -3,23 +3,38 @@
 ## http-signature-headers
 
 * [http-signature-headers](#module_http-signature-headers)
-    * [~createSignatureInputHeader
+    * _static_
+        * [.createSignatureHeader](#module_http-signature-headers.createSignatureHeader) ⇒ <code>string</code>
+    * _inner_
+        * [~createSignatureInputHeader
 
 Takes in a Map of signature inputs and outputs an sf dictionary header.(options)](#module_http-signature-headers..createSignatureInputHeader
 
 Takes in a Map of signature inputs and outputs an sf dictionary header.) ⇒ <code>string</code>
-    * [~createSignatureInputString
+        * [~createSignatureInputString
 
 Takes in a strutured fields inner list containing a signatures inputs
 and outputs a string to be signed.(options)](#module_http-signature-headers..createSignatureInputString
 
 Takes in a strutured fields inner list containing a signatures inputs
 and outputs a string to be signed.) ⇒ <code>string</code>
-    * [~parseRequest
+        * [~parseRequest
 Takes in a request object and options and parses the signature inputs.(request, [options])](#module_http-signature-headers..parseRequest
 Takes in a request object and options and parses the signature inputs.) ⇒ <code>Map.&lt;string, object&gt;</code>
-    * [~Item](#module_http-signature-headers..Item) : <code>object</code>
-    * [~SignatureInput](#module_http-signature-headers..SignatureInput) : <code>object</code>
+        * [~Item](#module_http-signature-headers..Item) : <code>object</code>
+        * [~SignatureInput](#module_http-signature-headers..SignatureInput) : <code>object</code>
+
+<a name="module_http-signature-headers.createSignatureHeader"></a>
+
+### http-signature-headers.createSignatureHeader ⇒ <code>string</code>
+Takes in an object with key sig name value signed signing string.
+
+**Kind**: static constant of [<code>http-signature-headers</code>](#module_http-signature-headers)  
+**Returns**: <code>string</code> - An FS encoded dictionary with the sig values.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| signatures | <code>object</code> | An object with signatures. |
 
 <a name="module_http-signature-headers..createSignatureInputHeader
 
