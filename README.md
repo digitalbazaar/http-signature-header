@@ -123,9 +123,9 @@ const httpMessage = {
 const coveredContent = [{value: 'one'}];
 const params = {alg: 'foo'};
 // this turns your coveredContent etc into SF Items
-const sig1 = convertToSFInnerList({coveredContent, params});
 const stringToSign = httpSignatureHeader.createSignatureInputString({
-  signatureInput: sig1,
+  coveredContent,
+  params,
   httpMessage
 });
 const data = new TextEncoder().encode(stringToSign);

@@ -192,6 +192,26 @@ describe('http-signature', () => {
         ';alg="bar"'
       );
     });
+    it('properly encodes `@request-target` with a path using ' +
+      'coveredContent & params', () => {
+      const date = new Date().toUTCString();
+      const httpMessage = {
+        headers: {date},
+        method: 'GET',
+        url: 'https://example.com/1/2/3',
+      };
+      const stringToSign = httpSignatureHeader.createSignatureInputString({
+        coveredContent: ['date', '@request-target'],
+        params: {keyid: 'foo', alg: 'bar'},
+        httpMessage
+      });
+      stringToSign.should.equal(
+        `"date": ${date}\n"@request-target": get /1/2/3` +
+        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        ';alg="bar"'
+      );
+    });
+
     it('properly encodes `@request-target` with a relative path', () => {
       const date = new Date().toUTCString();
       const httpMessage = {
