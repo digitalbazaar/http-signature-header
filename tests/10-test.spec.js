@@ -4,7 +4,7 @@
 'use strict';
 
 import chai from 'chai';
-import {decodeDict} from 'structured-field-values';
+import {Item, decodeDict} from 'structured-field-values';
 import * as httpSignatureHeader from '../lib/index.js';
 import {
   signatureInputs,
@@ -156,7 +156,7 @@ describe('http-signature', () => {
         httpMessage
       });
       stringToSign.should.equal(`"date": ${date}\n` +
-        '"@signature-parameters": ("date");keyid="foo";alg="bar"');
+        '"@signature-params": ("date");keyid="foo";alg="bar"');
     });
     it('properly encodes `@request-target` with root path', () => {
       const date = new Date().toUTCString();
@@ -171,7 +171,7 @@ describe('http-signature', () => {
         httpMessage
       });
       stringToSign.should.equal(`"date": ${date}\n"@request-target": get /` +
-        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        '\n"@signature-params": ("date" "@request-target");keyid="foo"' +
         ';alg="bar"');
     });
     it('properly encodes `@request-target` with a path', () => {
@@ -188,7 +188,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"@request-target": get /1/2/3` +
-        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        '\n"@signature-params": ("date" "@request-target");keyid="foo"' +
         ';alg="bar"'
       );
     });
@@ -207,7 +207,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"@request-target": get /1/2/3` +
-        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        '\n"@signature-params": ("date" "@request-target");keyid="foo"' +
         ';alg="bar"'
       );
     });
@@ -226,7 +226,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"@request-target": get /relative/path` +
-        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        '\n"@signature-params": ("date" "@request-target");keyid="foo"' +
         ';alg="bar"'
       );
     });
@@ -244,7 +244,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"@request-target": post /` +
-        '\n"@signature-parameters": ("date" "@request-target");keyid="foo"' +
+        '\n"@signature-params": ("date" "@request-target");keyid="foo"' +
         ';alg="bar"'
       );
     });
@@ -263,7 +263,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"host": example.com\n"date": ${date}\n"@request-target": get /1/2/3` +
-        '\n"@signature-parameters": ("host" "date" "@request-target")' +
+        '\n"@signature-params": ("host" "date" "@request-target")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -281,7 +281,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"host": example.com:18443\n"date": ${date}\n"@request-target": get ` +
-        '/1/2/3\n"@signature-parameters": ("host" "date" "@request-target")' +
+        '/1/2/3\n"@signature-params": ("host" "date" "@request-target")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -301,7 +301,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"zero": ` +
-        '\n"@signature-parameters": ("date" "zero")' +
+        '\n"@signature-params": ("date" "zero")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -321,7 +321,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"zero": ` +
-        '\n"@signature-parameters": ("date" "zero")' +
+        '\n"@signature-params": ("date" "zero")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -340,7 +340,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"multiple": true, false` +
-        '\n"@signature-parameters": ("date" "multiple")' +
+        '\n"@signature-params": ("date" "multiple")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -359,7 +359,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"dictionary": foo` +
-        '\n"@signature-parameters": ("date" "dictionary";key="test")' +
+        '\n"@signature-params": ("date" "dictionary";key="test")' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -408,7 +408,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"list": (foo)` +
-        '\n"@signature-parameters": ("date" "list";prefix=1)' +
+        '\n"@signature-params": ("date" "list";prefix=1)' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -429,7 +429,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"list": (1, 2, 3)` +
-        '\n"@signature-parameters": ("date" "list";prefix=3)' +
+        '\n"@signature-params": ("date" "list";prefix=3)' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -451,7 +451,7 @@ describe('http-signature', () => {
       });
       stringToSign.should.equal(
         `"date": ${date}\n"list": ()` +
-        '\n"@signature-parameters": ("date" "list";prefix=0)' +
+        '\n"@signature-params": ("date" "list";prefix=0)' +
         ';keyid="foo";alg="bar"'
       );
     });
@@ -638,6 +638,19 @@ describe('http-signature', () => {
   });
 */
   describe('parseRequest API', function() {
+    const shouldBeParsedSignature = actualSig => {
+      expect(actualSig).to.be.an('object');
+      expect(actualSig.errors).to.be.an('Array');
+      expect(
+        actualSig.signatureInput,
+        'expected "signatureInput" to be a structured field Item'
+      ).to.be.an.instanceOf(Item);
+      expect(
+        actualSig.signature,
+        'expected "signature" to be a structured field Item'
+      ).to.be.an.instanceOf(Item);
+      expect(actualSig.signingString).to.be.a('string');
+    };
     it('should parse a Signature with no covered content', () => {
       const request = {...requests.exampleOne};
       request.headers['Signature-Input'] = signatureInputs.exampleOne;
@@ -645,7 +658,31 @@ describe('http-signature', () => {
       const result = httpSignatureHeader.parseRequest(request);
       expect(result).to.be.a('Map');
       const sig1 = result.get('sig1');
-      console.log(sig1);
+      shouldBeParsedSignature(sig1);
+      sig1.errors.length.should.equal(0);
+      sig1.signingString.should.equal('"@signature-params": ()' +
+      ';created=1618884475;keyid="test-key-rsa-pss";alg="rsa-pss-sha512"');
+    });
+    it('should parse a Signature with covered content', () => {
+      const request = {...requests.exampleOne};
+      request.headers['Signature-Input'] = signatureInputs.exampleTwo;
+      request.headers.Signature = signatures.exampleTwo;
+      const result = httpSignatureHeader.parseRequest(request);
+      expect(result).to.be.a('Map');
+      const sig1 = result.get('sig1');
+      shouldBeParsedSignature(sig1);
+      sig1.errors.length.should.equal(0);
+      sig1.signingString.should.equal(
+        '"@request-target": post /foo?param=value&pet=dog\n' +
+        '"host": example.com\n' +
+        '"date": Tue, 20 Apr 2021 02:07:55 GMT\n' +
+        '"content-type": application/json\n' +
+        '"digest": SHA-256=X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=\n' +
+        '"content-length": 18\n' +
+        '"@signature-params": ("@request-target"' +
+        ' "host" "date" "content-type" "digest" "content-length")' +
+        ';created=1618884475;keyid="test-key-rsa-pss"'
+      );
     });
   });
 /*

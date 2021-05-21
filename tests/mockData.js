@@ -6,6 +6,9 @@ export const signatureInputs = {
     ';keyid="foo";alg="bar"',
   exampleOne: 'sig1=();created=1618884475;' +
     'keyid="test-key-rsa-pss";alg="rsa-pss-sha512"',
+  exampleTwo: 'sig1=("@request-target" "host" "date" "content-type"' +
+  ' "digest" "content-length");created=1618884475' +
+  ';keyid="test-key-rsa-pss"',
   empty: 'sig1=();alg="foo"',
   multipleEmpty: 'sig1=();alg="foo", sig2=();alg="foo"',
   one: 'sig1=("one");alg="foo"',
@@ -28,7 +31,12 @@ export const signatures = {
   'CKp/ijZemO1iPdNwrdhAtDvj9OdFVJ/wiUECfU78aQWkQocvwrZXTmHCX9BMVUHGneXMY' +
   'NQ0Y8umEHjxpnnLLvxUbw2KZrflp+l6m7WlhwXGJ15eAt1+mImanxUCtaKQJvEfcnOQ0S' +
   '2jHysSRLheTA==:',
-  exampleTwo: ''
+  exampleTwo: 'sig1=:QNPZtqAGWN1YMtsLJ1oyQMLg9TuIwjsIBESTo1/YXUsG+6Sl1uKUdT' +
+  'e9xswwrc3Ui3gUd4/tLv48NGih2TRDc1AWbEQDuy6pjroxSPtFjquubqzbszxit1arPNh' +
+  'ONnyR/8yuIh3bOXfc/NYJ3KLNaWR6MKrGinCYKTNwrX/0V67EMdSgd5HHnW5xHFgKfRCj' +
+  'rG3ncV+jbaeSPJ8e96RZgr8slcdwmqXdiwiIBCQDKRIQ3U2muJWvxyjV/IYhCTwAXJaUz' +
+  'sQPKzR5QWelXEVdHyv4WIB2lKaYh7mAsz0/ANxFYRRSp2Joms0OAnIAFX9kKCSp4p15/Q' +
+  '8L9vSIGNpQtw==:'
 };
 
 export const keys = {

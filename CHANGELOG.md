@@ -18,6 +18,7 @@
 ### Changed
 - This package is now a module.
 - `parseRequest` does not validate `created` or `expires`.
+- `keyid` is optional.
 
 ## 2.0.1 - 2021-03-02
 
