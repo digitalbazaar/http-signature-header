@@ -36,8 +36,8 @@ This library implements [Signing HTTP Messages](https://www.ietf.org/archive/id/
 In order for this library to work each HTTP Message must contain 2 headers.
 Those headers are:
 
-`Signature-Input` A structured field dictionary in which each entry is a list of covered content
-`Signature` A structured field field dictionary in which each entry is contains a Binary Sequence
+`Signature-Input` A structured field dictionary in which each entry is a list of covered content with params.
+`Signature` A structured field field dictionary in which each value is a Binary Sequence.
 
 
 Example: 
@@ -76,8 +76,8 @@ const dict = httpSignatureHeader.createSignatureInputHeader({
   // this will add the params to all the signatures
   params: {alg: 'foo'}
 });
-console.log(dict);
 // this is a valid `Signature-Input` header:
+console.log(dict);
 //sig1=("one");alg="foo"
 ```
 
@@ -92,8 +92,8 @@ const dict = httpSignatureHeader.createSignatureInputHeader({
   // this will add the params to all the signatures
   params: {alg: 'foo'}
 });
-console.log(dict);
 // this is a valid `Signature-Input` header:
+console.log(dict);
 //sig1=("one");alg="foo", sig2=("two");alg="foo"
 ```
 example: 
@@ -106,8 +106,8 @@ const dict = httpSignatureHeader.createSignatureInputHeader({
     ['sig2', {coveredContent: [{value: 'two'}], params: {alg: 'bar'}}]
   ]),
 });
-console.log(dict);
 // this is a valid `Signature-Input` header:
+console.log(dict);
 //sig1=("one");alg="foo", sig2=("two");alg="bar"
 ```
 

@@ -1,5 +1,24 @@
 # http-signature-header
 
+## 3.0.0 - TBD
+
+### Removed
+- **BREAKING**: `createAuthzHeader` has been removed.
+- **BREAKING**: `createSignatureString` has been removed.
+- **BREAKING**: CommonJS Module exports.
+- **BREAKING**: Support for Node < 14.
+
+### Added
+- **BREAKING**: Support for [Signing HTTP Messages](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-04.html)
+- `createSignatureHeader` has been added.
+- `createSignatureInputHeader` has been added.
+- `createSignatureInputString` has been added.
+- Support for es6 module import and export.
+
+### Changed
+- This package is now a module.
+- `parseRequest` does not validate `created` or `expires`.
+
 ## 2.0.1 - 2021-03-02
 
 ### Added
