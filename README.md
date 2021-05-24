@@ -35,8 +35,8 @@ npm install
 This library implements [Signing HTTP Messages](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-04.html)
 In order for this library to work each HTTP request must contain 2 headers:
 
-`Signature-Input` A structured field dictionary in which each entry is a list of covered content with params.
-`Signature` A structured field field dictionary in which each value is a Binary Sequence.
+- `Signature-Input` A structured field dictionary in which each entry is a list of covered content with params.
+- `Signature` A structured field field dictionary in which each value is a Binary Sequence.
 
 
 Example: 
