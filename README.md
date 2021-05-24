@@ -63,7 +63,7 @@ Signature: sig1=:H00a6KdNCRWgOWBMvuRtxh6c/wrVxwt2p5KyqBJqmtPbNTd980hWwk\
 
 You can make those headers by using the `createSignatureInputHeader` and `createSignatureHeader` APIs.
 
-`createSignatureInputHeader` takes a Map and turns that Map into a `Signature-Input` header.
+The `createSignatureInputHeader` API takes a Map and turns that Map into a `Signature-Input` header.
 
 example: 
 ```js
