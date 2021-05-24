@@ -132,8 +132,7 @@ const data = new TextEncoder().encode(stringToSign);
 const signature = await invocationSigner.sign({data});
 ```
 
-`createSignatureHeader` is much easier. Sign the signing string for your signature
-and pass it as a `Uint8Array`.
+The `createSignatureHeader` API is used to encode the signature bytes provided as a `Uint8Array`.
 
 example: 
 ```js
