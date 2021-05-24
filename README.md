@@ -144,9 +144,9 @@ console.log(dict);
 ```
 
 
-`parseRequest` takes in a request that is expected to be similar to
-a request object in `express.js`. It then parses the `Signature-Input` header and returns
-a Map with the signature id and then an object with everything you need to sign:
+The `parseRequest` API takes in a request object similar to a request object in `express.js`. 
+It then parses the `Signature-Input` header and returns
+a Map with the signature id and then an object with everything needed to create a signed header:
 ```js
 const request = {
   method: 'Post',
