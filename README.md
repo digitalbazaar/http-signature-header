@@ -61,7 +61,7 @@ Signature: sig1=:H00a6KdNCRWgOWBMvuRtxh6c/wrVxwt2p5KyqBJqmtPbNTd980hWwk\
     9DWCo2AaYD/rkXtQ==:
 ```
 
-You can make those headers by using the functions `createSignatureInputHeader` and `createSignatureHeader`.
+You can make those headers by using the `createSignatureInputHeader` and `createSignatureHeader` APIs.
 
 `createSignatureInputHeader` takes a Map and turns that Map into a `Signature-Input` header.
 
