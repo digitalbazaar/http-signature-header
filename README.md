@@ -121,7 +121,7 @@ const httpMessage = {
 };
 const coveredContent = [{value: 'one'}];
 const params = {alg: 'foo'};
-// this turns your coveredContent etc into SF Items
+// this turns the coveredContent etc into SF Items
 const stringToSign = httpSignatureHeader.createSignatureInputString({
   coveredContent,
   params,
