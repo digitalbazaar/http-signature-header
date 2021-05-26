@@ -83,7 +83,7 @@ console.log(dict);
 example: 
 ```js
 const dict = httpSignatureHeader.createSignatureInputHeader({
-  // here we have 2 signatures for the request
+  // there are 2 signatures for the request
   signatures: new Map([
     ['sig1', {coveredContent: [{value: 'one'}]}],
     ['sig2', {coveredContent: [{value: 'two'}]}]
