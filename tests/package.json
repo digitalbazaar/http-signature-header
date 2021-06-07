@@ -1,0 +1,10 @@
+{
+  "name": "http-signature-header-tests",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Test for HTTP Signature Header.",
+  "type": "module",
+  "dependencies": {
+    "http-signature-header": "file://.."
+  }
+}

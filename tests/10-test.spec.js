@@ -5,7 +5,8 @@
 
 import chai from 'chai';
 import {Item, decodeDict} from 'structured-field-values';
-import * as httpSignatureHeader from '../lib/index.js';
+import * as httpSignatureHeader from 'http-signature-header';
+import hsigs from 'http-signature-header';
 import {
   signatureInputs,
   signatures,
@@ -17,6 +18,9 @@ chai.should();
 const {expect} = chai;
 
 describe('http-signature', () => {
+console.log('HTTP SIGS DEFAULT STUFF', httpSignatureHeader, '\n');
+console.log('imported with out * as \n', hsigs);
+process.exit();
   describe('createSignatureHeader', () => {
     it('should create a dictionary with one signature', () => {
       const sigs = {sig1: new Uint8Array([1, 2, 3])};
