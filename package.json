@@ -11,6 +11,8 @@
     "lib"
   ],
   "scripts": {
+    "build": "npm run build-webpack",
+    "build-webpack": "webpack",
     "test": "npm run test-node",
     "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.js",
     "test-karma": "cross-env NODE_ENV=test karma start karma.conf.cjs",
@@ -39,6 +41,9 @@
     "structured-field-values": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "babel-loader": "^8.2.2",
     "chai": "^4.1.2",
     "cross-env": "^7.0.2",
     "eslint": "^7.20.0",
@@ -55,7 +60,8 @@
     "mocha": "^8.4.0",
     "nyc": "^15.0.1",
     "uuid": "^3.2.1",
-    "webpack": "^5.37.0"
+    "webpack": "^5.38.1",
+    "webpack-bundle-analyzer": "^4.4.2"
   },
   "browser": {
     "./lib/url.js": "./lib/url-browser.js",
@@ -68,5 +74,8 @@
     "exclude": [
       "tests"
     ]
+  },
+  "browser": {
+    "Buffer": false
   }
 }
