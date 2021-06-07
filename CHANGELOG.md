@@ -6,7 +6,7 @@
 - **BREAKING**: `createAuthzHeader` has been removed.
 - **BREAKING**: `createSignatureString` has been removed.
 - **BREAKING**: CommonJS Module exports.
-- **BREAKING**: Support for Node < 14.
+- **BREAKING**: Drop support for Node < 14.
 
 ### Added
 - **BREAKING**: Support for [Signing HTTP Messages](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-04.html)
