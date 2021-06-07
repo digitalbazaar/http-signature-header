@@ -1,5 +1,29 @@
 # http-signature-header
 
+## 3.0.0 - TBD
+
+### Removed
+- **BREAKING**: We're dropping support for `Authentication` headers so the API `createAuthzHeader` has been removed.
+- **BREAKING**: The latest spec uses a new format for signing strings so the API `createSignatureString` has been removed.
+- **BREAKING**: CommonJS Module exports have been dropped in favor of ES6 import/export statements.
+- **BREAKING**: Drop support for Node < 14.
+
+### Added
+- **BREAKING**: Support for next major release of [Signing HTTP Messages](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-04.html)
+- The latest spec encodes signature(s) as entries in structured field dictionaries in a `Signature` header so the API `createSignatureHeader` has been added.
+- The latest spec requires a `Signature-Input` header which is a structured field dictionary created using the API `createSignatureInputHeader`.
+- Signing Strings are now structured field inner lists created using the API `createSignatureInputString`.
+- **BREAKING**: Support for es6 module import and export is the only way to access this library. Tools such as webpack can be used for legacy application.
+- A new markdown file called `API.md` contains a break down of all public API methods.
+- **BREAKING**: Support for including values from headers that are structured field dictionaries in signing strings (see the README.md for usage).
+- **BREAKING**: Support for including values from headers that are structured field inner lists in signings strings (see the README.md for usage).
+
+### Changed
+- **BREAKING**: In the latest spec API `parseRequest` does not validate `created` or `expires`.
+- **BREAKING**: In the latest spec `(key-id)` has been changed to `keyid` and is now optional.
+- **BREAKING**: `Psuedo-headers` are no longer included in the signing string using the `(psuedo-header)` syntax.
+- **BREAKING**: All structured field params included in a signature entry are included in the signing string (this replaces `(psuedo-headers)`).
+
 ## 2.0.1 - 2021-03-02
 
 ### Added
