@@ -467,8 +467,8 @@ describe('http-signature', () => {
       parsed.should.have.property('keyId');
       parsed.keyId.should.be.a('string');
     };
-    // tests occur 3 seconds after the epoch
-    const now = 3;
+    // tests occur 1000 seconds after the epoch
+    const now = 1000;
     it('should use Date.now() when now is not specified', () => {
       const created = Math.floor(Date.now() / 1000);
       const authorization = 'Signature keyId="https://example.com/key/1",' +
@@ -495,14 +495,14 @@ describe('http-signature', () => {
       parsed.signingString.should.contain(`(created): ${created}`);
     });
     it('properly encodes `(created)` with a timestamp', () => {
-      const created = 1;
+      const created = now;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (created)",' +
         `signature="mockSignature",created="${created}"`;
       const request = {
         headers: {
           host: 'example.com:18443',
-          date: new Date(created).toUTCString(),
+          date: new Date(created * 1000).toUTCString(),
           authorization
         },
         method: 'GET',
@@ -520,14 +520,14 @@ describe('http-signature', () => {
       parsed.signingString.should.contain(`(created): ${created}`);
     });
     it('properly encodes `(created)` as a string', () => {
-      const created = 1;
+      const created = now;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (created)",' +
         `signature="mockSignature",created="${created}"`;
       const request = {
         headers: {
           host: 'example.com:18443',
-          date: new Date(created).toUTCString(),
+          date: new Date(created * 1000).toUTCString(),
           authorization
         },
         method: 'GET',
@@ -544,15 +544,15 @@ describe('http-signature', () => {
       parsed.params.created.should.equal(String(created));
       parsed.signingString.should.contain(`(created): ${created}`);
     });
-    it('rejects `(created)` in the future', () => {
-      const created = 4;
+    it('rejects `(created)` in the future w/ default clock skew', () => {
+      const created = now + 301;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (created)",' +
         `signature="mockSignature",created="${created}"`;
       const request = {
         headers: {
           host: 'example.com:18443',
-          date: new Date(created).toUTCString(),
+          date: new Date(created * 1000).toUTCString(),
           authorization
         },
         method: 'GET',
@@ -564,6 +564,34 @@ describe('http-signature', () => {
       try {
         result = httpSignatureHeader.parseRequest(
           request, {headers: expectedHeaders, now});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal(
+        'Invalid signature; the signature creation time is in the future.');
+    });
+    it('rejects `(created)` in the future with no clock skew', () => {
+      const created = now + 1;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (created)",' +
+        `signature="mockSignature",created="${created}"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(created * 1000).toUTCString(),
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(created)', '(request-target)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now, clockSkew: 0});
       } catch(e) {
         error = e;
       }
@@ -601,7 +629,7 @@ describe('http-signature', () => {
         '"created" must be a UNIX timestamp or JavaScript Date.');
     });
     it('convert (created) Date objects to unix timestamps', () => {
-      const date = new Date(1000);
+      const date = new Date(now * 1000);
       const timestamp = Math.floor(date.getTime() / 1000);
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (created)",' +
@@ -628,7 +656,7 @@ describe('http-signature', () => {
     });
 
     it('properly encodes `(expires)` with a timestamp', () => {
-      const expires = 3;
+      const expires = now;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (expires)",' +
         `signature="mockSignature",expires="${expires}"`;
@@ -655,7 +683,7 @@ describe('http-signature', () => {
       parsed.signingString.should.contain(`(expires): ${expires}`);
     });
     it('properly encodes `(expires)` with a timestamp & x-date', () => {
-      const expires = 3;
+      const expires = now;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="x-date host (request-target) (expires)",' +
         `signature="mockSignature",expires="${expires}"`;
@@ -680,7 +708,7 @@ describe('http-signature', () => {
       parsed.signingString.should.contain(`(expires): ${expires}`);
     });
     it('properly encodes `(expires)` as a string', () => {
-      const expires = String(3);
+      const expires = String(now);
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (expires)",' +
         `signature="mockSignature",expires="${expires}"`;
@@ -734,15 +762,15 @@ describe('http-signature', () => {
       error.message.should.equal(
         '"expires" must be a UNIX timestamp or JavaScript Date.');
     });
-    it('rejects `(expires)` that is in the past', () => {
-      const expires = 1;
+    it('rejects `(expires)` that is in the past w/ default clock skew', () => {
+      const expires = now - 301;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target) (expires)",' +
         `signature="mockSignature",expires="${expires}"`;
       const request = {
         headers: {
           host: 'example.com:18443',
-          date: new Date(expires),
+          date: new Date(expires * 1000),
           authorization
         },
         method: 'GET',
@@ -761,8 +789,35 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('The signature has expired.');
     });
-    it('rejects expires header that is in the past', () => {
-      const expires = 1;
+    it('rejects `(expires)` that is in the past w/ no clock skew', () => {
+      const expires = now - 1;
+      const authorization = 'Signature keyId="https://example.com/key/1",' +
+        'headers="date host (request-target) (expires)",' +
+        `signature="mockSignature",expires="${expires}"`;
+      const request = {
+        headers: {
+          host: 'example.com:18443',
+          date: new Date(expires * 1000),
+          authorization
+        },
+        method: 'GET',
+        url: 'https://example.com:18443/1/2/3',
+      };
+      const expectedHeaders = ['host', '(expires)', '(request-target)'];
+      let error = null;
+      let result = null;
+      try {
+        result = httpSignatureHeader.parseRequest(
+          request, {headers: expectedHeaders, now, clockSkew: 0});
+      } catch(e) {
+        error = e;
+      }
+      expect(result, 'result should not exist').to.be.null;
+      expect(error, 'error should exist').to.not.be.null;
+      error.message.should.equal('The signature has expired.');
+    });
+    it('rejects expires header that is in past w/ default clock skew', () => {
+      const expires = now - 301;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         'headers="date host (request-target)",' +
         `signature="mockSignature"`;
@@ -789,16 +844,16 @@ describe('http-signature', () => {
       expect(error, 'error should exist').to.not.be.null;
       error.message.should.equal('The request has expired.');
     });
-    it('rejects if skew is greater then clockSkew', () => {
-      const _now = 1603386114;
-      const date = _now - 350;
+    it('rejects expires header that is in past w/ no clock skew', () => {
+      const expires = now - 1;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
-        'headers="x-date host (request-target)",' +
+        'headers="date host (request-target)",' +
         `signature="mockSignature"`;
       const request = {
         headers: {
           host: 'example.com:18443',
-          'x-date': new Date(date * 1000),
+          date: new Date(now * 1000),
+          expires: new Date(expires * 1000),
           authorization
         },
         method: 'GET',
@@ -809,13 +864,13 @@ describe('http-signature', () => {
       let result = null;
       try {
         result = httpSignatureHeader.parseRequest(
-          request, {headers: expectedHeaders, now: _now});
+          request, {headers: expectedHeaders, now, clockSkew: 0});
       } catch(e) {
         error = e;
       }
       expect(result, 'result should not exist').to.be.null;
       expect(error, 'error should exist').to.not.be.null;
-      error.message.should.equal('Clock skew of 350s was greater than 300s');
+      error.message.should.equal('The request has expired.');
     });
     it('rejects if signature is missing from AuthzHeader', () => {
       const _now = 1000;
@@ -930,7 +985,7 @@ describe('http-signature', () => {
 
     // this is for covered content
     it('default headers should be (created)', () => {
-      const created = 1;
+      const created = now;
       const authorization = 'Signature keyId="https://example.com/key/1",' +
         `signature="mockSignature",created="${created}"`;
       const request = {
