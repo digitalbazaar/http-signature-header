@@ -343,7 +343,7 @@ describe('parseRequest API', () => {
         should.exist(parsed.signingString);
         parsed.signingString.should.equal(
           'date: ' + options.headers.Date + '\n' +
-          'digest: ' + options.headers['digest'] + '\n' +
+          'digest: ' + options.headers.digest + '\n' +
           '(request-target): get /');
         parsed.params.keyId.should.equal(parsed.keyId);
         parsed.params.algorithm.toUpperCase().should.equal(parsed.algorithm);
@@ -397,7 +397,7 @@ describe('parseRequest API', () => {
         parsed.signingString.should.equal(
           'x-custom: ' + options.headers['x-custom'].join(', ') + '\n' +
           'date: ' + options.headers.Date + '\n' +
-          'digest: ' + options.headers['digest'] + '\n' +
+          'digest: ' + options.headers.digest + '\n' +
           '(request-target): get /');
         parsed.params.keyId.should.equal(parsed.keyId);
         parsed.params.algorithm.toUpperCase().should.equal(parsed.algorithm);
