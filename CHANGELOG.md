@@ -1,6 +1,6 @@
 # http-signature-header
 
-## 2.0.2 - 2021-06-xx
+## 2.0.2 - 2021-06-09
 
 ### Fixed
 - Ensure that clock skew is considered when comparing dates.
