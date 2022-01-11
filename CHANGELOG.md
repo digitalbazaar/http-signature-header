@@ -1,5 +1,10 @@
 # http-signature-header
 
+## 3.0.0 - 2022-01-xx
+
+### Changed
+- **BREAKING**: Rename package to `@digitalbazaar/http-signature-header`.
+
 ## 2.0.2 - 2021-06-09
 
 ### Fixed
