@@ -1,9 +1,15 @@
 # http-signature-header
 
+## 4.0.1 - 2022-01-xx
+
+### Changed
+- **BREAKING**: Add node 12 package.json requirement.
+
 ## 4.0.0 - 2022-01-11
 
 ### Changed
 - **BREAKING**: Rename package to `@digitalbazaar/http-signature-header`.
+- **BREAKING**: Require node 12.x.
 
 ## 3.0.0 - 2022-01-11
 
