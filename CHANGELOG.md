@@ -5,6 +5,9 @@
 ### Changed
 - **BREAKING**: Add node 12 package.json requirement.
 
+### Fixed
+- Remove unused dependencies.
+
 ## 4.0.0 - 2022-01-11
 
 ### Changed

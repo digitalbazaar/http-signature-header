@@ -15,12 +15,7 @@
   "devDependencies": {
     "commander": "^2.20.0",
     "http-message-parser": "0.0.34",
-    "http-signature-middleware": "^1.1.0",
-    "jsprim": "^2.0.0",
-    "signature-algorithms": "^1.0.0",
-    "bs58": "^4.0.1"
+    "jsprim": "^2.0.0"
   },
-  "dependencies": {
-    "node-forge": "^0.10.0"
-  }
+  "dependencies": {}
 }
