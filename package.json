@@ -1,5 +1,5 @@
 {
-  "name": "http-signature-header",
+  "name": "@digitalbazaar/http-signature-header",
   "version": "3.0.1-0",
   "description": "",
   "main": "lib",
