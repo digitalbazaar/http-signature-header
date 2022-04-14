@@ -11,7 +11,7 @@ const chai = require('chai');
 const http = require('http');
 const httpSignatureHeader = require('..');
 const should = chai.should();
-const uuid = require('uuid/v4');
+const {v4: uuid} = require('uuid');
 
 let commonOptions = null;
 let server = null;

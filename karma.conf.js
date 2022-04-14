@@ -27,15 +27,8 @@ module.exports = function(config) {
     },
 
     webpack: {
-      //mode: 'production',
       mode: 'development',
-      devtool: 'inline-source-map',
-      node: {
-        Buffer: false,
-        process: false,
-        crypto: false,
-        setImmediate: false
-      }
+      devtool: 'inline-source-map'
     },
 
     // test results reporter to use
