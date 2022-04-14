@@ -1,6 +1,6 @@
 # @digitalbazaar/http-signature-header
 
-## 4.1.0 - 2022-xx-xx
+## 4.1.0 - 2022-04-13
 
 ### Changed
 - Change from "env" platform detection to util.js with browser override file.
