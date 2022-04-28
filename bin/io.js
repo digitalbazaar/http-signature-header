@@ -1,11 +1,8 @@
 /**
- * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2022 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-
-const fs = require('fs');
-const util = require('util');
-const httpMessageParser = require('http-message-parser');
+import {promises as fs} from 'fs';
+import httpMessageParser from 'http-message-parser';
 
 /**
  * This opens a file from disk asynchronously.
@@ -14,7 +11,7 @@ const httpMessageParser = require('http-message-parser');
  *
  * @returns {string|Buffer} The result of opening the file.
  */
-exports.readFile = util.promisify(fs.readFile);
+export const readFile = fs.readFile;
 
 /**
  * Simple wrapper around node's process.stdin.
@@ -24,7 +21,7 @@ exports.readFile = util.promisify(fs.readFile);
  *
  * @returns {Promise<string>} Should return the http message.
  */
-async function getStdin(encoding = 'utf8') {
+export async function getStdin(encoding = 'utf8') {
   const {stdin} = process;
   let message = '';
   return new Promise((resolve, reject) => {
@@ -43,9 +40,8 @@ async function getStdin(encoding = 'utf8') {
     }
   });
 }
-exports.getStdIn = getStdin;
 
-async function getHTTPMessage() {
+export async function getHTTPMessage() {
   const HTTPMessage = await getStdin();
   if(!HTTPMessage) {
     throw new Error(
@@ -55,4 +51,3 @@ async function getHTTPMessage() {
   // similar to node's default request object.
   return httpMessageParser(HTTPMessage);
 }
-exports.getHTTPMessage = getHTTPMessage;

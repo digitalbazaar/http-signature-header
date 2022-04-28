@@ -5,6 +5,7 @@ module.exports = {
   },
   extends: [
     'digitalbazaar',
-    'digitalbazaar/jsdoc'
+    'digitalbazaar/jsdoc',
+    'digitalbazaar/module'
   ]
 };

@@ -3,15 +3,14 @@
  * https://github.com/joyent/node-http-signature
  * Copyright 2012 Joyent, Inc.  All rights reserved.
  *
- * Copyright (c) 2018-2019 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2018-2022 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
+import chai from 'chai';
+import http from 'http';
+import httpSignatureHeader from '../lib/index.js';
+import {v4 as uuid} from 'uuid';
 
-const chai = require('chai');
-const http = require('http');
-const httpSignatureHeader = require('..');
 const should = chai.should();
-const {v4: uuid} = require('uuid');
 
 let commonOptions = null;
 let server = null;

@@ -1,14 +1,12 @@
 /*!
- * Copyright (c) 2018-2021 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2018-2022 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-
-const chai = require('chai');
+import chai from 'chai';
 chai.should();
 
 const {expect} = chai;
-const httpSignatureHeader = require('../lib');
-const HttpSignatureError = require('../lib/HttpSignatureError');
+import * as httpSignatureHeader from '../lib/index.js';
+import {HttpSignatureError} from '../lib/HttpSignatureError.js';
 
 describe('http-signature', () => {
 
