@@ -33,7 +33,9 @@ npm install
 ## Usage
 
 ```js
-const {createAuthzHeader, createSignatureString} = require('http-signature-header');
+import {
+  createAuthzHeader, createSignatureString
+} from '@digitalbazaar/http-signature-header';
 
 const requestOptions = {
   url,

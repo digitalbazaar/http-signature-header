@@ -2,7 +2,7 @@
   "name": "http-signature-header-bin",
   "version": "0.0.1",
   "description": "Simple binary wrapper around http-signature-header in order to comply with w3c standards tests.",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +13,7 @@
   },
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "commander": "^2.20.0",
+    "commander": "^9.2.0",
     "http-message-parser": "0.0.34",
     "jsprim": "^2.0.0"
   },

@@ -1,6 +1,6 @@
-const crypto = require('crypto');
-const httpSigs = require('../lib/');
-const jsprim = require('jsprim');
+import crypto from 'crypto';
+import * as httpSigs from '../lib/index.js';
+import jsprim from 'jsprim';
 
 function makeHTTPHeaders(headers = {}) {
   let message = '';
@@ -142,8 +142,8 @@ async function createHttpSignatureRequest({
   return requestOptions.headers;
 }
 
-exports.canonicalize = async function({program, message: requestOptions}) {
-  const {headers, created, expires} = program;
+export async function canonicalize({opts, message: requestOptions}) {
+  const {headers, created, expires} = opts;
   if(headers === true) {
     return '';
   }
@@ -154,14 +154,15 @@ exports.canonicalize = async function({program, message: requestOptions}) {
   const result = httpSigs.
     createSignatureString({includeHeaders, requestOptions});
   return result;
-};
+}
 
-exports.sign = async function(
-  {program, message: requestOptions, privateKeyFile}) {
+export async function sign({
+  opts, message: requestOptions, privateKeyFile
+}) {
   const {
     headers, keyType, privateKey,
     algorithm
-  } = program;
+  } = opts;
   if(!privateKey) {
     throw new Error('A private key is required for signing');
   }
@@ -176,10 +177,11 @@ exports.sign = async function(
   const result = await createHttpSignatureRequest(options);
   const message = makeHTTPHeaders(result);
   return message;
-};
+}
 
-exports.verify = async function(
-  {program, message: requestOptions, publicKeyFile}) {
+export async function verify({
+  opts, message: requestOptions, publicKeyFile
+}) {
   /**
     * 1. Recreate the canonzied string (not hashed, not signed, not base 64).
     * 1a. Might need to hash canonized.
@@ -188,7 +190,7 @@ exports.verify = async function(
     * 4. Decode the actual `signature` paramter to bytes (not base 64).
     * 5. Pass publicKey, canonziedString, and decoded signature bytes to verify.
    */
-  const {headers = '', keyType} = program;
+  const {headers = '', keyType} = opts;
   const includeHeaders = headers;
   let canonicalizedString = Buffer.from(httpSigs.
     createSignatureString({includeHeaders, requestOptions}));
@@ -218,4 +220,4 @@ exports.verify = async function(
     return canonicalizedString.toString();
   }
   return 'Signature verification failed.';
-};
+}

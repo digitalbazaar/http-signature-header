@@ -2,7 +2,8 @@
   "name": "@digitalbazaar/http-signature-header",
   "version": "4.1.1-0",
   "description": "",
-  "main": "lib",
+  "type": "module",
+  "exports": "./lib/index.js",
   "directories": {
     "lib": "lib"
   },
@@ -12,12 +13,12 @@
   "scripts": {
     "test": "npm run test-node",
     "test-node": "cross-env NODE_ENV=test mocha --preserve-symlinks -t 30000 -R ${REPORTER:-spec} tests/*.spec.js",
-    "test-karma": "cross-env NODE_ENV=test karma start karma.conf.js",
+    "test-karma": "cross-env NODE_ENV=test karma start karma.conf.cjs",
     "benchmark": "node benchmark/benchmark.js",
-    "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary npm run test-node",
-    "coverage-ci": "cross-env NODE_ENV=test nyc --reporter=lcovonly npm run test-node",
-    "coverage-report": "nyc report",
-    "lint": "eslint ."
+    "coverage": "cross-env NODE_ENV=test c8 --reporter=lcov --reporter=text-summary npm run test-node",
+    "coverage-ci": "cross-env NODE_ENV=test c8 --reporter=lcovonly --reporter text npm run test-node",
+    "coverage-report": "c8 report",
+    "lint": "eslint . bin/http-signature-header-js.js"
   },
   "repository": {
     "type": "git",
@@ -36,20 +37,21 @@
     "assert-plus": "^1.0.0"
   },
   "devDependencies": {
+    "c8": "^7.11.2",
     "chai": "^4.3.6",
     "cross-env": "^7.0.3",
-    "eslint": "^7.32.0",
-    "eslint-config-digitalbazaar": "^2.8.0",
-    "eslint-plugin-jsdoc": "^39.2.1",
-    "karma": "^6.3.18",
+    "eslint": "^8.14.0",
+    "eslint-config-digitalbazaar": "^3.0.0",
+    "eslint-plugin-jsdoc": "^39.2.9",
+    "eslint-plugin-unicorn": "^42.0.0",
+    "karma": "^6.3.19",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.1",
     "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.8",
     "karma-webpack": "^5.0.0",
-    "mocha": "^8.4.0",
-    "nyc": "^15.1.0",
+    "mocha": "^9.2.2",
     "uuid": "^8.3.2",
     "webpack": "^5.72.0"
   },
@@ -57,9 +59,9 @@
     "./lib/util.js": "./lib/util-browser.js"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14"
   },
-  "nyc": {
+  "c8": {
     "exclude": [
       "tests"
     ]
