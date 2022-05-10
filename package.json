@@ -4,6 +4,9 @@
   "description": "",
   "type": "module",
   "exports": "./lib/index.js",
+  "browser": {
+    "./lib/util.js": "./lib/util-browser.js"
+  },
   "files": [
     "lib"
   ],
@@ -51,9 +54,6 @@
     "mocha": "^9.2.2",
     "uuid": "^8.3.2",
     "webpack": "^5.72.0"
-  },
-  "browser": {
-    "./lib/util.js": "./lib/util-browser.js"
   },
   "engines": {
     "node": ">=14"
