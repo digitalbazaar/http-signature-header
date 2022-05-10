@@ -4,9 +4,6 @@
   "description": "",
   "type": "module",
   "exports": "./lib/index.js",
-  "directories": {
-    "lib": "lib"
-  },
   "files": [
     "lib"
   ],
