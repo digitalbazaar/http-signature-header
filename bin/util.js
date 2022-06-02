@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import * as httpSigs from '../lib/index.js';
 import jsprim from 'jsprim';
 

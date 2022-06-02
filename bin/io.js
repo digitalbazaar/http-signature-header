@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2019-2022 Digital Bazaar, Inc. All rights reserved.
  */
-import {promises as fs} from 'fs';
+import {promises as fs} from 'node:fs';
 import httpMessageParser from 'http-message-parser';
 
 /**
