@@ -6,7 +6,7 @@
  * Copyright (c) 2018-2022 Digital Bazaar, Inc. All rights reserved.
  */
 import chai from 'chai';
-import http from 'http';
+import http from 'node:http';
 import httpSignatureHeader from '../lib/index.js';
 import {v4 as uuid} from 'uuid';
 
