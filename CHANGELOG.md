@@ -1,6 +1,6 @@
 # @digitalbazaar/http-signature-header
 
-## 5.0.0 - 2022-xx-xx
+## 5.0.0 - 2022-06-02
 
 ### Changed
 - **BREAKING**: Convert to module (ESM).
