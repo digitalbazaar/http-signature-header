@@ -1,6 +1,6 @@
 {
   "name": "@digitalbazaar/http-signature-header",
-  "version": "5.0.1",
+  "version": "5.0.2-0",
   "description": "",
   "license": "BSD-3-Clause",
   "type": "module",
