@@ -1,9 +1,9 @@
 # @digitalbazaar/http-signature-header
 
-## 5.0.1 - 2024-08-xx
+## 5.0.1 - 2024-08-08
 
 ### Changed
-- Add `package.json` `license` field .
+- Add `package.json` `license` field.
 - Test on Node.js 20.x.
 
 ## 5.0.0 - 2022-06-02
